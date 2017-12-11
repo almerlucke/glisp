@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 
 	"github.com/almerlucke/glisp/tokenizer"
 )
@@ -15,7 +16,10 @@ if err != nil {
 */
 
 func main() {
-	tz, err := tokenizer.CreateWithFile("/Users/almerlucke/Documents/Projects/Go/src/github.com/almerlucke/glisp/examples/source.glisp")
+	d, err := os.Getwd()
+	log.Printf("wdir %s %v\n", d, err)
+
+	tz, err := tokenizer.CreateWithFile("./examples/source.glisp")
 	if err != nil {
 		log.Printf("err %v\n", err)
 		return

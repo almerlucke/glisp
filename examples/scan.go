@@ -1,37 +1,34 @@
 package main
 
 import (
+	"bufio"
+	"io"
 	"log"
 	"os"
 
-	"github.com/almerlucke/glisp/tokenizer"
+	"github.com/almerlucke/glisp/environment"
+	"github.com/almerlucke/glisp/reader"
 )
 
-/*
-tz, err := tokenizer.CreateWithFile("/Users/almerlucke/Documents/Projects/Go/src/github.com/almerlucke/glisp/examples/source.glisp")
-if err != nil {
-	log.Printf("err %v\n", err)
-	return
-}
-*/
-
 func main() {
-	d, err := os.Getwd()
-	log.Printf("wdir %s %v\n", d, err)
-
-	tz, err := tokenizer.CreateWithFile("./examples/source.glisp")
+	f, err := os.Open("./examples/source.glisp")
 	if err != nil {
-		log.Printf("err %v\n", err)
-		return
+		log.Fatal("Can't open file")
 	}
 
-	defer tz.Destroy()
+	defer f.Close()
 
-	token, err := tz.NextToken()
-	if err != nil {
-		log.Printf("err %v\n", err)
-		return
+	environment := environment.New()
+	reader := reader.New(bufio.NewReader(f), environment)
+
+	obj, err := reader.Read()
+	for err == nil {
+		log.Printf("obj %v\n", obj)
+
+		obj, err = reader.Read()
 	}
 
-	log.Printf("%v\n", token)
+	if err != nil && err != io.EOF {
+		log.Fatalf("Reader err: %v\n", err)
+	}
 }

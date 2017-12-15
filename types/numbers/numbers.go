@@ -1,6 +1,7 @@
-package number
+package numbers
 
 import (
+	"fmt"
 	"reflect"
 
 	"github.com/almerlucke/glisp/types"
@@ -15,4 +16,9 @@ type Number struct {
 // Type Number for Object interface
 func (num *Number) Type() types.Type {
 	return types.Number
+}
+
+// String for stringer interface
+func (num *Number) String() string {
+	return fmt.Sprintf("%v", num.Value)
 }

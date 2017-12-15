@@ -5,10 +5,14 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"reflect"
+	"regexp"
+	"strconv"
 	"unicode"
 
 	"github.com/almerlucke/glisp/environment"
 	"github.com/almerlucke/glisp/types"
+	"github.com/almerlucke/glisp/types/numbers"
 )
 
 const (
@@ -43,6 +47,9 @@ const (
 	MultipleEscape
 )
 
+// untilCondition for nextRunes
+type untilCondition func(rune) (bool, error)
+
 // MacroFunction defines a function being called when a macro character is
 // encountered
 type MacroFunction func(reader *Reader) (types.Object, error)
@@ -62,6 +69,7 @@ type Reader struct {
 	lineCount int
 	charCount int
 	env       *environment.Environment
+	depth     int
 }
 
 // Error specific for the reader
@@ -134,7 +142,41 @@ func (reader *Reader) newLine() {
 
 // UnreadChar unreads a single character from the stream
 func (reader *Reader) UnreadChar() error {
+	reader.charCount--
 	return reader.scanner.UnreadRune()
+}
+
+func (reader *Reader) nextRunes(n int, until untilCondition) ([]rune, error) {
+	rl := list.New()
+
+	for n > 0 {
+		c, _, err := reader.ReadChar()
+		if err != nil {
+			// return err and slice, err can be EOF
+			return runeListToSlice(rl), err
+		}
+
+		// Check until condition for stop signal or error
+		stop, err := until(c)
+		if err != nil {
+			return runeListToSlice(rl), err
+		}
+
+		if stop {
+			// Unread the last rune that caused until to return true
+			err = reader.UnreadChar()
+			if err != nil {
+				return runeListToSlice(rl), nil
+			}
+
+			break
+		}
+
+		rl.PushBack(c)
+		n--
+	}
+
+	return runeListToSlice(rl), nil
 }
 
 // IsWhitespace check if char is whitespace
@@ -150,7 +192,7 @@ func (reader *Reader) IsNewline(c rune) bool {
 }
 
 // SkipWhitespace skip whitespace
-func (reader *Reader) SkipWhitespace() error {
+func (reader *Reader) skipWhitespace() error {
 	c, _, err := reader.ReadChar()
 
 	// Skip while space runes
@@ -177,7 +219,53 @@ func runeListToSlice(l *list.List) []rune {
 	return rs
 }
 
-func (reader *Reader) parseSymbol() (types.Object, error) {
+// IsInteger returns true if string represents an integer
+func IsInteger(s string) bool {
+	reg := regexp.MustCompile(`^[+-]?[0-9]+$`)
+
+	return reg.MatchString(s)
+}
+
+// IsFloat returns true if string represents a float
+func IsFloat(s string) bool {
+	reg := regexp.MustCompile(`^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$`)
+
+	return reg.MatchString(s)
+}
+
+func (reader *Reader) tokenToObject(token string) types.Object {
+	if IsInteger(token) {
+		i, err := strconv.ParseInt(token, 10, 64)
+		if err != nil {
+			i = 0
+		}
+
+		return &numbers.Number{
+			Kind:  reflect.Int64,
+			Value: i,
+		}
+	} else if IsFloat(token) {
+		f, err := strconv.ParseFloat(token, 64)
+		if err != nil {
+			f = 0
+		}
+
+		return &numbers.Number{
+			Kind:  reflect.Float64,
+			Value: f,
+		}
+	}
+
+	sym := reader.env.DefineSymbol(token, false, nil)
+	if sym.Value != nil {
+		// Symbol has a self referencing value, return value instead of symbol
+		return sym.Value
+	}
+
+	return sym
+}
+
+func (reader *Reader) parseToken() (types.Object, error) {
 	cl := list.New()
 	singleEscapeActive := false
 	multipleEscapeActive := false
@@ -230,7 +318,7 @@ func (reader *Reader) parseSymbol() (types.Object, error) {
 		c, ci, err = reader.ReadChar()
 	}
 
-	return reader.env.DefineSymbol(string(runeListToSlice(cl)), false), nil
+	return reader.tokenToObject(string(runeListToSlice(cl))), nil
 }
 
 func (reader *Reader) parseNonTerminatingMacro() (types.Object, error) {
@@ -239,18 +327,18 @@ func (reader *Reader) parseNonTerminatingMacro() (types.Object, error) {
 
 func (reader *Reader) Read() (types.Object, error) {
 	// First skip whitespace
-	err := reader.SkipWhitespace()
+	err := reader.skipWhitespace()
 	if err != nil {
-		return nil, reader.ErrorWithError(err)
+		return nil, err
 	}
 
 	c, ci, err := reader.ReadChar()
 	if err != nil {
-		return nil, reader.ErrorWithError(err)
+		return nil, err
 	}
 
 	if ci == nil {
-		return nil, reader.Error(fmt.Sprintf("Illegal character %c found", c))
+		return nil, fmt.Errorf("Illegal character %c found", c)
 	}
 
 	var obj types.Object
@@ -265,28 +353,32 @@ func (reader *Reader) Read() (types.Object, error) {
 	case Constituent:
 		err = reader.UnreadChar()
 		if err != nil {
-			return nil, reader.ErrorWithError(err)
+			return nil, err
 		}
 
-		obj, err = reader.parseSymbol()
+		obj, err = reader.parseToken()
 		if err != nil && err != io.EOF {
-			return nil, reader.ErrorWithError(err)
+			return nil, err
 		}
 
 	case TerminatingMacro:
 		if ci.Macro != nil {
 			obj, err = ci.Macro(reader)
 			if err != nil {
-				return nil, reader.ErrorWithError(err)
+				return nil, err
+			}
+
+			if obj == nil {
+				return reader.Read()
 			}
 		} else {
-			return nil, reader.Error(fmt.Sprintf("No macro function attached to macro char %c", c))
+			return nil, fmt.Errorf("No macro function attached to macro char %c", c)
 		}
 
 	case NonTerminatingMacro:
 		obj, err = reader.parseNonTerminatingMacro()
 		if err != nil {
-			return nil, reader.ErrorWithError(err)
+			return nil, err
 		}
 	}
 

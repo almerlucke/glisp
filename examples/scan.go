@@ -6,8 +6,10 @@ import (
 	"log"
 	"os"
 
-	"github.com/almerlucke/glisp/environment"
+	"github.com/almerlucke/glisp"
+	"github.com/almerlucke/glisp/evaluator"
 	"github.com/almerlucke/glisp/reader"
+	"github.com/almerlucke/glisp/types"
 )
 
 func main() {
@@ -18,17 +20,26 @@ func main() {
 
 	defer f.Close()
 
-	environment := environment.New()
-	reader := reader.New(bufio.NewReader(f), environment)
+	env := glisp.CreateDefaultEnvironment()
+	reader := reader.New(bufio.NewReader(f), env)
 
 	obj, err := reader.Read()
+	var result types.Object
+
 	for err == nil {
-		log.Printf("obj %v\n", obj)
+		result, err = evaluator.Eval(obj, env)
+		if err != nil {
+			log.Fatalf("eval error %v\n", reader.ErrorWithError(err))
+		}
 
 		obj, err = reader.Read()
 	}
 
 	if err != nil && err != io.EOF {
-		log.Fatalf("Reader err: %v\n", err)
+		log.Fatalf("Reader err: %v\n", reader.ErrorWithError(err))
+	}
+
+	if result != nil {
+		log.Printf("%v\n", result)
 	}
 }

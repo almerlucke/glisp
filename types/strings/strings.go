@@ -1,4 +1,4 @@
-package string
+package strings
 
 import "github.com/almerlucke/glisp/types"
 
@@ -6,6 +6,6 @@ import "github.com/almerlucke/glisp/types"
 type String string
 
 // Type String for Object interface
-func (str *String) Type() types.Type {
+func (str String) Type() types.Type {
 	return types.String
 }

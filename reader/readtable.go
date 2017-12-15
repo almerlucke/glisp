@@ -41,6 +41,7 @@ func generateDefaultReadTable() ReadTable {
 		'"': &Character{
 			SyntaxType: TerminatingMacro,
 			Char:       '"',
+			Macro:      stringMacro,
 		},
 		'#': &Character{
 			SyntaxType: NonTerminatingMacro,
@@ -61,14 +62,17 @@ func generateDefaultReadTable() ReadTable {
 		'\'': &Character{
 			SyntaxType: TerminatingMacro,
 			Char:       '\'',
+			Macro:      quoteMacro,
 		},
 		'(': &Character{
 			SyntaxType: TerminatingMacro,
 			Char:       '(',
+			Macro:      openParenthesisMacro,
 		},
 		')': &Character{
 			SyntaxType: TerminatingMacro,
 			Char:       ')',
+			Macro:      closeParenthesisMacro,
 		},
 		'*': &Character{
 			SyntaxType: Constituent,

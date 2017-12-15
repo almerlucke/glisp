@@ -16,6 +16,8 @@ const (
 	String
 	// Number object type
 	Number
+	// Function object type
+	Function
 )
 
 // Object interface, every Lisp object must implement these methods
@@ -43,7 +45,17 @@ func (b *Bool) Type() Type {
 	return Boolean
 }
 
+// String implements the stringer interface
+func (b *Bool) String() string {
+	return "T"
+}
+
 // Type Null
 func (n *Nil) Type() Type {
 	return Null
+}
+
+// String implements the stringer interface
+func (n *Nil) String() string {
+	return "NIL"
 }

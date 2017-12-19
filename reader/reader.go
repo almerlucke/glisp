@@ -52,7 +52,13 @@ type untilCondition func(rune) (bool, error)
 
 // MacroFunction defines a function being called when a macro character is
 // encountered
-type MacroFunction func(reader *Reader) (types.Object, error)
+type MacroFunction func(*Reader) (types.Object, error)
+
+// DispatchMacroFunction defines a function being called when a dispatch macro
+// character is encountered. The standard dispatch char is #, after that an
+// optional sequence of digits is read, after the sequence the next character is
+// a selector for the macro function called
+type DispatchMacroFunction func(uint64, *Reader) (types.Object, error)
 
 // Character holds reader character info
 type Character struct {
@@ -62,14 +68,21 @@ type Character struct {
 	Macro           MacroFunction
 }
 
+// ReadTable is a map from rune to character info
+type ReadTable map[rune]*Character
+
+// DispatchTable is a map from rune to a dispatch macro function
+type DispatchTable map[rune]DispatchMacroFunction
+
 // Reader implements the Lisp reader
 type Reader struct {
-	scanner   io.RuneScanner
-	readTable ReadTable
-	lineCount int
-	charCount int
-	env       *environment.Environment
-	depth     int
+	scanner       io.RuneScanner
+	readTable     ReadTable
+	dispatchTable DispatchTable
+	lineCount     int
+	charCount     int
+	env           *environment.Environment
+	Depth         int
 }
 
 // Error specific for the reader
@@ -90,12 +103,13 @@ func (reader *Reader) ErrorWithError(err error) error {
 	return reader.Error(err.Error())
 }
 
-// New creates a new reader with the default read table
-func New(scanner io.RuneScanner, env *environment.Environment) *Reader {
+// New creates a new reader
+func New(scanner io.RuneScanner, readTable ReadTable, dispatchTable DispatchTable, env *environment.Environment) *Reader {
 	return &Reader{
-		scanner:   scanner,
-		readTable: DefaultReadTable,
-		env:       env,
+		scanner:       scanner,
+		readTable:     readTable,
+		dispatchTable: dispatchTable,
+		env:           env,
 	}
 }
 
@@ -120,7 +134,8 @@ func (reader *Reader) ReadChar() (rune, *Character, error) {
 
 		// If c is not a linefeed, unread
 		if c != Newline {
-			c = Return
+			// Return is always converted to newline
+			c = Newline
 			err = reader.scanner.UnreadRune()
 			if err != nil {
 				return 0, nil, err
@@ -146,27 +161,28 @@ func (reader *Reader) UnreadChar() error {
 	return reader.scanner.UnreadRune()
 }
 
-func (reader *Reader) nextRunes(n int, until untilCondition) ([]rune, error) {
+// NextRunes gets the next n runes from stream until condition
+func (reader *Reader) NextRunes(n int, until untilCondition) ([]rune, error) {
 	rl := list.New()
 
 	for n > 0 {
 		c, _, err := reader.ReadChar()
 		if err != nil {
 			// return err and slice, err can be EOF
-			return runeListToSlice(rl), err
+			return RuneListToSlice(rl), err
 		}
 
 		// Check until condition for stop signal or error
 		stop, err := until(c)
 		if err != nil {
-			return runeListToSlice(rl), err
+			return RuneListToSlice(rl), err
 		}
 
 		if stop {
 			// Unread the last rune that caused until to return true
 			err = reader.UnreadChar()
 			if err != nil {
-				return runeListToSlice(rl), nil
+				return RuneListToSlice(rl), nil
 			}
 
 			break
@@ -176,7 +192,7 @@ func (reader *Reader) nextRunes(n int, until untilCondition) ([]rune, error) {
 		n--
 	}
 
-	return runeListToSlice(rl), nil
+	return RuneListToSlice(rl), nil
 }
 
 // IsWhitespace check if char is whitespace
@@ -208,7 +224,8 @@ func (reader *Reader) skipWhitespace() error {
 	return err
 }
 
-func runeListToSlice(l *list.List) []rune {
+// RuneListToSlice converts a list of runes to a slice of runes
+func RuneListToSlice(l *list.List) []rune {
 	rs := make([]rune, l.Len())
 	rc := 0
 	for e := l.Front(); e != nil; e = e.Next() {
@@ -318,14 +335,17 @@ func (reader *Reader) parseToken() (types.Object, error) {
 		c, ci, err = reader.ReadChar()
 	}
 
-	return reader.tokenToObject(string(runeListToSlice(cl))), nil
+	return reader.tokenToObject(string(RuneListToSlice(cl))), nil
 }
 
-func (reader *Reader) parseNonTerminatingMacro() (types.Object, error) {
-	return nil, nil
+// DispatchMacroForCharacter returns a dispatch macro for a character
+// can return nil if no dispatch macro is defined
+func (reader *Reader) DispatchMacroForCharacter(c *Character) DispatchMacroFunction {
+	return reader.dispatchTable[unicode.ToLower(c.Char)]
 }
 
-func (reader *Reader) Read() (types.Object, error) {
+// ReadObject reads an object from the stream
+func (reader *Reader) ReadObject() (types.Object, error) {
 	// First skip whitespace
 	err := reader.skipWhitespace()
 	if err != nil {
@@ -361,6 +381,8 @@ func (reader *Reader) Read() (types.Object, error) {
 			return nil, err
 		}
 
+	case NonTerminatingMacro:
+		fallthrough
 	case TerminatingMacro:
 		if ci.Macro != nil {
 			obj, err = ci.Macro(reader)
@@ -369,16 +391,10 @@ func (reader *Reader) Read() (types.Object, error) {
 			}
 
 			if obj == nil {
-				return reader.Read()
+				return reader.ReadObject()
 			}
 		} else {
 			return nil, fmt.Errorf("No macro function attached to macro char %c", c)
-		}
-
-	case NonTerminatingMacro:
-		obj, err = reader.parseNonTerminatingMacro()
-		if err != nil {
-			return nil, err
 		}
 	}
 

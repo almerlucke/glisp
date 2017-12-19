@@ -21,22 +21,22 @@ func main() {
 	defer f.Close()
 
 	env := glisp.CreateDefaultEnvironment()
-	reader := reader.New(bufio.NewReader(f), env)
+	rd := reader.New(bufio.NewReader(f), glisp.DefaultReadTable, glisp.DefaultDispatchTable, env)
 
-	obj, err := reader.Read()
+	obj, err := rd.ReadObject()
 	var result types.Object
 
 	for err == nil {
 		result, err = evaluator.Eval(obj, env)
 		if err != nil {
-			log.Fatalf("eval error %v\n", reader.ErrorWithError(err))
+			log.Fatalf("eval error %v\n", rd.ErrorWithError(err))
 		}
 
-		obj, err = reader.Read()
+		obj, err = rd.ReadObject()
 	}
 
 	if err != nil && err != io.EOF {
-		log.Fatalf("Reader err: %v\n", reader.ErrorWithError(err))
+		log.Fatalf("Reader err: %v\n", rd.ErrorWithError(err))
 	}
 
 	if result != nil {

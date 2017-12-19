@@ -1,24 +1,25 @@
-package reader
+package macros
 
 import (
 	"errors"
 	"io"
 
 	"github.com/almerlucke/glisp/environment"
+	"github.com/almerlucke/glisp/reader"
 	"github.com/almerlucke/glisp/types"
 	"github.com/almerlucke/glisp/types/cons"
 )
 
 // OpenParenthesisMacro is called when an open parenthesis is encountered
-func openParenthesisMacro(reader *Reader) (types.Object, error) {
+func OpenParenthesisMacro(reader *reader.Reader) (types.Object, error) {
 	dotFound := false
 	dottedObjCnt := 0
 	builder := cons.ListBuilder{}
 
-	reader.depth++
+	reader.Depth++
 
 	for {
-		obj, err := reader.Read()
+		obj, err := reader.ReadObject()
 		if err != nil {
 			if err == io.EOF {
 				return nil, errors.New("Unmatched parenthesis")
@@ -53,7 +54,7 @@ func openParenthesisMacro(reader *Reader) (types.Object, error) {
 		}
 	}
 
-	reader.depth--
+	reader.Depth--
 
 	if builder.Head == nil {
 		return types.NIL, nil
@@ -63,8 +64,8 @@ func openParenthesisMacro(reader *Reader) (types.Object, error) {
 }
 
 // CloseParenthesisMacro is called when a closing parenthesis is encountered
-func closeParenthesisMacro(reader *Reader) (types.Object, error) {
-	if reader.depth == 0 {
+func CloseParenthesisMacro(reader *reader.Reader) (types.Object, error) {
+	if reader.Depth == 0 {
 		return nil, errors.New("Unmatched parenthesis")
 	}
 

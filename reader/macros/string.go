@@ -1,4 +1,4 @@
-package reader
+package macros
 
 import (
 	"container/list"
@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"unicode"
 
+	"github.com/almerlucke/glisp/reader"
 	"github.com/almerlucke/glisp/types"
 	"github.com/almerlucke/glisp/types/strings"
 )
@@ -34,8 +35,8 @@ func isHexadecimal(r rune) bool {
 	return unicode.Is(unicode.ASCII_Hex_Digit, r)
 }
 
-func (reader *Reader) octalEscape(startDigit rune) (rune, error) {
-	rs, err := reader.nextRunes(2, func(r rune) (bool, error) {
+func octalEscape(startDigit rune, rd *reader.Reader) (rune, error) {
+	rs, err := rd.NextRunes(2, func(r rune) (bool, error) {
 		return !isOctal(r), nil
 	})
 
@@ -47,8 +48,8 @@ func (reader *Reader) octalEscape(startDigit rune) (rune, error) {
 	return rune(o), err
 }
 
-func (reader *Reader) hexadecimalEscape() (rune, error) {
-	rs, err := reader.nextRunes(math.MaxInt32, func(r rune) (bool, error) {
+func hexadecimalEscape(rd *reader.Reader) (rune, error) {
+	rs, err := rd.NextRunes(math.MaxInt32, func(r rune) (bool, error) {
 		return !isHexadecimal(r), nil
 	})
 
@@ -60,8 +61,8 @@ func (reader *Reader) hexadecimalEscape() (rune, error) {
 	return rune(hex), err
 }
 
-func (reader *Reader) unicodeEscape(n int, escapeChar rune) ([]rune, error) {
-	rs, err := reader.nextRunes(n, func(r rune) (bool, error) {
+func unicodeEscape(n int, escapeChar rune, rd *reader.Reader) ([]rune, error) {
+	rs, err := rd.NextRunes(n, func(r rune) (bool, error) {
 		return !isHexadecimal(r), nil
 	})
 
@@ -83,8 +84,8 @@ func (reader *Reader) unicodeEscape(n int, escapeChar rune) ([]rune, error) {
 	return []rune(str), err
 }
 
-func (reader *Reader) escapeSequence() ([]rune, error) {
-	c, _, err := reader.ReadChar()
+func escapeSequence(rd *reader.Reader) ([]rune, error) {
+	c, _, err := rd.ReadChar()
 	if err != nil {
 		return nil, err
 	}
@@ -107,14 +108,14 @@ func (reader *Reader) escapeSequence() ([]rune, error) {
 	case 'v':
 		c = 0x0B
 	case 'x':
-		c, err = reader.hexadecimalEscape()
+		c, err = hexadecimalEscape(rd)
 	case 'u':
-		s, err = reader.unicodeEscape(4, 'u')
+		s, err = unicodeEscape(4, 'u', rd)
 	case 'U':
-		s, err = reader.unicodeEscape(8, 'U')
+		s, err = unicodeEscape(8, 'U', rd)
 	default:
 		if isOctal(c) {
-			c, err = reader.octalEscape(c)
+			c, err = octalEscape(c, rd)
 		}
 	}
 
@@ -126,21 +127,22 @@ func (reader *Reader) escapeSequence() ([]rune, error) {
 	return s, err
 }
 
-func stringMacro(reader *Reader) (types.Object, error) {
+// StringMacro macro for parsing a string object from stream
+func StringMacro(rd *reader.Reader) (types.Object, error) {
 	l := list.New()
 
 	for true {
-		c, _, err := reader.ReadChar()
+		c, _, err := rd.ReadChar()
 		if err != nil {
 			return nil, err
 		}
 
 		if c == '"' {
 			break
-		} else if c == Newline {
+		} else if c == reader.Newline {
 			return nil, errors.New("Multiline string not allowed")
 		} else if c == '\\' {
-			s, err := reader.escapeSequence()
+			s, err := escapeSequence(rd)
 			if err != nil {
 				return nil, err
 			}
@@ -153,5 +155,5 @@ func stringMacro(reader *Reader) (types.Object, error) {
 		}
 	}
 
-	return strings.String(runeListToSlice(l)), nil
+	return strings.String(reader.RuneListToSlice(l)), nil
 }

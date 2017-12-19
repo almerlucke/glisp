@@ -1,1 +1,5 @@
-'(1 2 3 4 5)
+'(1 2 3 4 5 "dit is een string met unicode \u1234") ; alles na de punt comma wordt genegeerd
+12 #| dit is een multiline comment
+en #|
+gaat over meerder lijnen, kan ook genest zijn
+|#4|#

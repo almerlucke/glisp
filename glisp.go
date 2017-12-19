@@ -17,7 +17,10 @@ var DefaultDispatchTable = generateDefaultDispatchTable()
 // CreateDefaultEnvironment creates a default GLisp environment
 func CreateDefaultEnvironment() *environment.Environment {
 	env := environment.New()
-	env.AddBinding(env.DefineSymbol("QUOTE", true, nil), buildin.CreateBuildinQuote())
+
+	env.AddBinding(environment.QuoteSymbol, buildin.CreateBuildinQuote())
+	env.AddBinding(environment.BackquoteSymbol, buildin.CreateBuildinBackquote())
+
 	return env
 }
 
@@ -109,6 +112,7 @@ func generateDefaultReadTable() reader.ReadTable {
 		',': &reader.Character{
 			SyntaxType: reader.TerminatingMacro,
 			Char:       ',',
+			Macro:      macros.UnquoteMacro,
 		},
 		'-': &reader.Character{
 			SyntaxType: reader.Constituent,
@@ -177,6 +181,7 @@ func generateDefaultReadTable() reader.ReadTable {
 		'`': &reader.Character{
 			SyntaxType: reader.TerminatingMacro,
 			Char:       '`',
+			Macro:      macros.BackquoteMacro,
 		},
 		'{': &reader.Character{
 			SyntaxType:      reader.Constituent,

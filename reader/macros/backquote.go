@@ -10,16 +10,18 @@ import (
 	"github.com/almerlucke/glisp/types/cons"
 )
 
-// QuoteMacro quote an object
-func QuoteMacro(rd *reader.Reader) (types.Object, error) {
+// BackquoteMacro backquote reader,
+func BackquoteMacro(rd *reader.Reader) (types.Object, error) {
 	var obj types.Object
 	var err error
+
+	rd.BackquoteDepth++
 
 	for {
 		obj, err = rd.ReadObject()
 		if err != nil {
 			if err == io.EOF {
-				return nil, errors.New("End of stream before end of quote")
+				return nil, errors.New("End of stream before end of backquote")
 			}
 			return nil, err
 		}
@@ -29,8 +31,10 @@ func QuoteMacro(rd *reader.Reader) (types.Object, error) {
 		}
 	}
 
+	rd.BackquoteDepth--
+
 	return &cons.Cons{
-		Car: environment.QuoteSymbol,
+		Car: environment.BackquoteSymbol,
 		Cdr: &cons.Cons{
 			Car: obj,
 			Cdr: types.NIL,

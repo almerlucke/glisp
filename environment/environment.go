@@ -36,7 +36,25 @@ var TSymbol = &symbols.Symbol{
 
 // QuoteSymbol is used for quoted objects
 var QuoteSymbol = &symbols.Symbol{
-	Name:     "QUOTE",
+	Name:     "SYSTEM::QUOTE",
+	Reserved: true,
+}
+
+// BackquoteSymbol is used for backquoted objects
+var BackquoteSymbol = &symbols.Symbol{
+	Name:     "SYSTEM::BACKQUOTE",
+	Reserved: true,
+}
+
+// UnquoteSymbol is used for unquoting
+var UnquoteSymbol = &symbols.Symbol{
+	Name:     "SYSTEM::UNQUOTE",
+	Reserved: true,
+}
+
+// SpliceSymbol is used for splicing
+var SpliceSymbol = &symbols.Symbol{
+	Name:     "SYSTEM::SPLICE",
 	Reserved: true,
 }
 
@@ -64,11 +82,14 @@ func New() *Environment {
 		scopes:   scopes,
 	}
 
-	env.symTable["NIL"] = NILSymbol
-	env.symTable["T"] = TSymbol
-	env.symTable["."] = DotSymbol
-	env.symTable[")"] = CloseParenthesisSymbol
-	env.symTable["QUOTE"] = QuoteSymbol
+	env.symTable[NILSymbol.Name] = NILSymbol
+	env.symTable[TSymbol.Name] = TSymbol
+	env.symTable[DotSymbol.Name] = DotSymbol
+	env.symTable[CloseParenthesisSymbol.Name] = CloseParenthesisSymbol
+	env.symTable[QuoteSymbol.Name] = QuoteSymbol
+	env.symTable[BackquoteSymbol.Name] = BackquoteSymbol
+	env.symTable[UnquoteSymbol.Name] = UnquoteSymbol
+	env.symTable[SpliceSymbol.Name] = SpliceSymbol
 
 	return env
 }

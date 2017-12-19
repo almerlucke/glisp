@@ -76,13 +76,14 @@ type DispatchTable map[rune]DispatchMacroFunction
 
 // Reader implements the Lisp reader
 type Reader struct {
-	scanner       io.RuneScanner
-	readTable     ReadTable
-	dispatchTable DispatchTable
-	lineCount     int
-	charCount     int
-	env           *environment.Environment
-	Depth         int
+	scanner        io.RuneScanner
+	readTable      ReadTable
+	dispatchTable  DispatchTable
+	lineCount      int
+	charCount      int
+	env            *environment.Environment
+	Depth          int
+	BackquoteDepth int
 }
 
 // Error specific for the reader

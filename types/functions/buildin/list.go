@@ -9,6 +9,10 @@ import (
 
 // List buildin function
 func List(args *cons.Cons, env *environment.Environment) (types.Object, error) {
+	if args == nil {
+		return types.NIL, nil
+	}
+
 	return args, nil
 }
 

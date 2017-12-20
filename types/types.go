@@ -1,5 +1,7 @@
 package types
 
+import "fmt"
+
 // Type of lisp object
 type Type uint
 
@@ -22,6 +24,7 @@ const (
 
 // Object interface, every Lisp object must implement these methods
 type Object interface {
+	fmt.Stringer
 	Type() Type
 }
 

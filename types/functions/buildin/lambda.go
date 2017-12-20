@@ -13,36 +13,42 @@ import (
 
 // Lambda buildin function
 func Lambda(args *cons.Cons, env *environment.Environment) (types.Object, error) {
-	// Arg list must be cons
-	if args.Car.Type() != types.Cons {
+	argType := args.Car.Type()
+
+	// Arg list must be cons or nil
+	if argType != types.Cons && argType != types.Null {
 		return nil, errors.New("lambda expected an arg list as first argument")
 	}
 
-	argList := args.Car.(*cons.Cons)
-	pure, length := argList.Info()
-	if !pure {
-		return nil, errors.New("lambda arg list must be a pure list")
-	}
+	symList := []*symbols.Symbol{}
 
-	symList := make([]*symbols.Symbol, length)
-
-	// Build sym arg slice
-	err := argList.Iter(func(obj types.Object, index uint64) error {
-		if obj.Type() != types.Symbol {
-			return errors.New("lambda arg list must contain only symbols")
+	if argType == types.Cons {
+		argList := args.Car.(*cons.Cons)
+		pure, length := argList.Info()
+		if !pure {
+			return nil, errors.New("lambda arg list must be a pure list")
 		}
 
-		if obj.(*symbols.Symbol).Reserved {
-			return fmt.Errorf("lambda arg list contains reserved symbol %v", obj.(*symbols.Symbol))
+		symList = make([]*symbols.Symbol, length)
+
+		// Build sym arg slice
+		err := argList.Iter(func(obj types.Object, index uint64) error {
+			if obj.Type() != types.Symbol {
+				return errors.New("lambda arg list must contain only symbols")
+			}
+
+			if obj.(*symbols.Symbol).Reserved {
+				return fmt.Errorf("lambda arg list contains reserved symbol %v", obj.(*symbols.Symbol))
+			}
+
+			symList[index] = obj.(*symbols.Symbol)
+
+			return nil
+		})
+
+		if err != nil {
+			return nil, err
 		}
-
-		symList[index] = obj.(*symbols.Symbol)
-
-		return nil
-	})
-
-	if err != nil {
-		return nil, err
 	}
 
 	var body *cons.Cons

@@ -28,6 +28,8 @@ func CreateDefaultEnvironment() *environment.Environment {
 	env.AddGlobalBinding(env.DefineSymbol("CAR", true, nil), buildin.CreateBuildinCar())
 	env.AddGlobalBinding(env.DefineSymbol("CONS", true, nil), buildin.CreateBuildinCons())
 	env.AddGlobalBinding(env.DefineSymbol("LAMBDA", true, nil), buildin.CreateBuildinLambda())
+	env.AddGlobalBinding(env.DefineSymbol("PRINT", true, nil), buildin.CreateBuildinPrint())
+	env.AddGlobalBinding(env.DefineSymbol("EXIT", true, nil), buildin.CreateBuildinExit())
 
 	return env
 }

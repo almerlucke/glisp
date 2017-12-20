@@ -49,6 +49,11 @@ func (fun *BuildinFunction) Eval(args *cons.Cons, env *environment.Environment) 
 	return fun.imp(args, env)
 }
 
+// String for Stringer
+func (fun *BuildinFunction) String() string {
+	return fmt.Sprintf("function(%p)", fun)
+}
+
 // LambdaFunction anonymous function
 type LambdaFunction struct {
 	argList       []*symbols.Symbol
@@ -78,6 +83,11 @@ func (fun *LambdaFunction) EvalArgs() bool {
 // Type of Function
 func (fun *LambdaFunction) Type() types.Type {
 	return types.Function
+}
+
+// String for Stringer
+func (fun *LambdaFunction) String() string {
+	return fmt.Sprintf("lambda(%p)", fun)
 }
 
 // Eval lambda function evaluation

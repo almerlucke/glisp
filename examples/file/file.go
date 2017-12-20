@@ -13,7 +13,7 @@ import (
 )
 
 func main() {
-	f, err := os.Open("./examples/source.glisp")
+	f, err := os.Open("./examples/file/source.glisp")
 	if err != nil {
 		log.Fatal("Can't open file")
 	}

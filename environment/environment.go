@@ -2,6 +2,7 @@ package environment
 
 import (
 	"container/list"
+	"fmt"
 
 	"github.com/almerlucke/glisp/types"
 	"github.com/almerlucke/glisp/types/symbols"
@@ -21,6 +22,9 @@ type Environment struct {
 	// Global scope is always at the end of the list, but also keep
 	// a reference here for ease
 	globalScope Scope
+
+	// Context can hold all kinds of values
+	Context map[string]interface{}
 }
 
 // New returns a new environment
@@ -42,7 +46,8 @@ func New() *Environment {
 			SpliceSymbol.Name:           SpliceSymbol,
 			AndRestSymbol.Name:          AndRestSymbol,
 		},
-		scopes: scopes,
+		scopes:  scopes,
+		Context: map[string]interface{}{},
 	}
 
 	return env
@@ -110,6 +115,21 @@ func (env *Environment) GetBinding(sym *symbols.Symbol) types.Object {
 	}
 
 	return obj
+}
+
+// SetBinding set binding for an already defined symbol
+func (env *Environment) SetBinding(sym *symbols.Symbol, obj types.Object) error {
+	// Go through scopes to find binding
+	for e := env.scopes.Front(); e != nil; e = e.Next() {
+		scope := e.Value.(Scope)
+		_, ok := scope[sym]
+		if ok {
+			scope[sym] = obj
+			return nil
+		}
+	}
+
+	return fmt.Errorf("unbound symbol %v", sym)
 }
 
 // GetSymbol returns a symbol or nil if not found

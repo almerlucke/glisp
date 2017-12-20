@@ -1,3 +1,20 @@
-(print ((lambda (a) `(1 2 ,@a)) '(1 2 3)))
 
-(list list)
+(scope
+  (var a
+    (lambda (a)
+      (lambda (b)
+        (cons a b)
+      )
+    )
+  )
+
+  (var b (a 1))
+
+  (print (b 2) (b 3) (b 4))
+
+  (var c1 2)
+
+  (var c `(cons 1 ,c1))
+
+  (print (eval c))
+)

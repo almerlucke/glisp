@@ -98,6 +98,12 @@ func (fun *LambdaFunction) Eval(args *cons.Cons, env *environment.Environment) (
 	// Push local scope for bound input arguments
 	env.PushScope(nil)
 
+	// Pop both local and captured scopes, even when an error occurs
+	defer func() {
+		env.PopScope()
+		env.PopScope()
+	}()
+
 	// Bind arguments
 	for _, sym := range fun.argList {
 		if sym.Reserved {
@@ -134,10 +140,6 @@ func (fun *LambdaFunction) Eval(args *cons.Cons, env *environment.Environment) (
 			return nil, err
 		}
 	}
-
-	// Pop both local and captured scopes
-	env.PopScope()
-	env.PopScope()
 
 	// Return the result
 	return result, nil

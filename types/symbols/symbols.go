@@ -1,6 +1,8 @@
 package symbols
 
-import "github.com/almerlucke/glisp/types"
+import (
+	"github.com/almerlucke/glisp/types"
+)
 
 // Symbol struct
 type Symbol struct {

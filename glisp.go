@@ -18,6 +18,9 @@ var DefaultDispatchTable = generateDefaultDispatchTable()
 func CreateDefaultEnvironment() *environment.Environment {
 	env := environment.New()
 
+	env.Context["defaultReadTable"] = DefaultReadTable
+	env.Context["defaultDispatchTable"] = DefaultDispatchTable
+
 	env.AddGlobalBinding(environment.QuoteSymbol, buildin.CreateBuildinQuote())
 	env.AddGlobalBinding(environment.BackquoteSymbol, buildin.CreateBuildinBackquote())
 	env.AddGlobalBinding(environment.UnquoteSymbol, buildin.CreateBuildinUnquote())
@@ -30,6 +33,11 @@ func CreateDefaultEnvironment() *environment.Environment {
 	env.AddGlobalBinding(env.DefineSymbol("LAMBDA", true, nil), buildin.CreateBuildinLambda())
 	env.AddGlobalBinding(env.DefineSymbol("PRINT", true, nil), buildin.CreateBuildinPrint())
 	env.AddGlobalBinding(env.DefineSymbol("EXIT", true, nil), buildin.CreateBuildinExit())
+	env.AddGlobalBinding(env.DefineSymbol("LOAD", true, nil), buildin.CreateBuildinLoad())
+	env.AddGlobalBinding(env.DefineSymbol("VAR", true, nil), buildin.CreateBuildinVar())
+	env.AddGlobalBinding(env.DefineSymbol("=", true, nil), buildin.CreateBuildinAssign())
+	env.AddGlobalBinding(env.DefineSymbol("SCOPE", true, nil), buildin.CreateBuildinScope())
+	env.AddGlobalBinding(env.DefineSymbol("EVAL", true, nil), buildin.CreateBuildinEval())
 
 	return env
 }

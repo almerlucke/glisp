@@ -61,7 +61,7 @@ func expansion(obj types.Object, env *environment.Environment) (types.Object, er
 
 					builder.PushBackObject(result)
 				} else {
-					// Expand list further
+					// Expand list
 					result, err := expansion(l, env)
 					if err != nil {
 						return nil, err
@@ -78,17 +78,21 @@ func expansion(obj types.Object, env *environment.Environment) (types.Object, er
 		return builder.Head, nil
 	}
 
+	// If not a cons just return the object unevaluated
 	return obj, nil
 }
 
 // Backquote buildin function
 func Backquote(args *cons.Cons, env *environment.Environment) (types.Object, error) {
+	obj := args.Car
+
 	// If not a list, return object unevaluated
-	if args.Car.Type() != types.Cons {
-		return args.Car, nil
+	if obj.Type() != types.Cons {
+		return obj, nil
 	}
 
-	l := args.Car.(*cons.Cons)
+	// Cast to list
+	l := obj.(*cons.Cons)
 
 	if l.Car == environment.UnquoteSymbol {
 		// Unquote arg
@@ -113,10 +117,6 @@ func Backquote(args *cons.Cons, env *environment.Environment) (types.Object, err
 }
 
 // CreateBuildinBackquote creates a buildin function object
-func CreateBuildinBackquote() *functions.Function {
-	return &functions.Function{
-		NumArgs:  1,
-		Imp:      Backquote,
-		EvalArgs: false,
-	}
+func CreateBuildinBackquote() *functions.BuildinFunction {
+	return functions.NewBuildinFunction(Backquote, 1, false)
 }

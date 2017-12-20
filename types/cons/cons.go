@@ -9,6 +9,9 @@ import (
 // MapFun function to be mapped
 type MapFun func(obj types.Object) (types.Object, error)
 
+// IterFun function to iterate over list
+type IterFun func(obj types.Object, index uint64) error
+
 // Cons is the main list structure
 type Cons struct {
 	Car types.Object
@@ -100,6 +103,21 @@ func (c *Cons) Map(fun MapFun) (*Cons, error) {
 	}
 
 	return builder.Head, nil
+}
+
+// Iter over a list
+func (c *Cons) Iter(fun IterFun) error {
+	index := uint64(0)
+	for e := types.Object(c); e.Type() == types.Cons; e = e.(*Cons).Cdr {
+		err := fun(e.(*Cons).Car, index)
+		if err != nil {
+			return err
+		}
+
+		index++
+	}
+
+	return nil
 }
 
 // ListBuilder can be used to build lists of cons objects

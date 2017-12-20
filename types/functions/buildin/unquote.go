@@ -1,0 +1,18 @@
+package buildin
+
+import (
+	"github.com/almerlucke/glisp/environment"
+	"github.com/almerlucke/glisp/types"
+	"github.com/almerlucke/glisp/types/cons"
+	"github.com/almerlucke/glisp/types/functions"
+)
+
+// Unquote buildin function
+func Unquote(args *cons.Cons, env *environment.Environment) (types.Object, error) {
+	return args.Car, nil
+}
+
+// CreateBuildinUnquote creates a buildin function object
+func CreateBuildinUnquote() *functions.BuildinFunction {
+	return functions.NewBuildinFunction(Unquote, 1, true)
+}

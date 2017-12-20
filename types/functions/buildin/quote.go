@@ -13,10 +13,6 @@ func Quote(args *cons.Cons, env *environment.Environment) (types.Object, error) 
 }
 
 // CreateBuildinQuote creates a buildin function object
-func CreateBuildinQuote() *functions.Function {
-	return &functions.Function{
-		NumArgs:  1,
-		Imp:      Quote,
-		EvalArgs: false,
-	}
+func CreateBuildinQuote() *functions.BuildinFunction {
+	return functions.NewBuildinFunction(Quote, 1, false)
 }

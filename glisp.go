@@ -18,8 +18,16 @@ var DefaultDispatchTable = generateDefaultDispatchTable()
 func CreateDefaultEnvironment() *environment.Environment {
 	env := environment.New()
 
-	env.AddBinding(environment.QuoteSymbol, buildin.CreateBuildinQuote())
-	env.AddBinding(environment.BackquoteSymbol, buildin.CreateBuildinBackquote())
+	env.AddGlobalBinding(environment.QuoteSymbol, buildin.CreateBuildinQuote())
+	env.AddGlobalBinding(environment.BackquoteSymbol, buildin.CreateBuildinBackquote())
+	env.AddGlobalBinding(environment.UnquoteSymbol, buildin.CreateBuildinUnquote())
+	env.AddGlobalBinding(environment.SpliceSymbol, buildin.CreateBuildinUnquote())
+
+	env.AddGlobalBinding(env.DefineSymbol("LIST", true, nil), buildin.CreateBuildinList())
+	env.AddGlobalBinding(env.DefineSymbol("CDR", true, nil), buildin.CreateBuildinCdr())
+	env.AddGlobalBinding(env.DefineSymbol("CAR", true, nil), buildin.CreateBuildinCar())
+	env.AddGlobalBinding(env.DefineSymbol("CONS", true, nil), buildin.CreateBuildinCons())
+	env.AddGlobalBinding(env.DefineSymbol("LAMBDA", true, nil), buildin.CreateBuildinLambda())
 
 	return env
 }

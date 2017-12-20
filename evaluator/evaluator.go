@@ -7,7 +7,7 @@ import (
 	"github.com/almerlucke/glisp/environment"
 	"github.com/almerlucke/glisp/types"
 	"github.com/almerlucke/glisp/types/cons"
-	"github.com/almerlucke/glisp/types/functions"
+	"github.com/almerlucke/glisp/types/functions/function"
 	"github.com/almerlucke/glisp/types/symbols"
 )
 
@@ -49,7 +49,7 @@ func Eval(obj types.Object, env *environment.Environment) (types.Object, error) 
 			return nil, fmt.Errorf("Eval %v is not a function", r)
 		}
 
-		fun := r.(*functions.Function)
+		fun := r.(function.Function)
 
 		// Check for pure and get length
 		pure, length := c.Info()
@@ -58,7 +58,7 @@ func Eval(obj types.Object, env *environment.Environment) (types.Object, error) 
 		}
 
 		// Check if we have enough arguments
-		if (length - 1) < int64(fun.NumArgs) {
+		if (length - 1) < int64(fun.NumArgs()) {
 			return nil, fmt.Errorf("Not enough arguments to function %v", c.Car)
 		}
 
@@ -66,7 +66,7 @@ func Eval(obj types.Object, env *environment.Environment) (types.Object, error) 
 		var args *cons.Cons
 		if c.Cdr != types.NIL {
 			args = c.Cdr.(*cons.Cons)
-			if fun.EvalArgs {
+			if fun.EvalArgs() {
 				args, err = EvalArgs(args, env)
 				if err != nil {
 					return nil, err

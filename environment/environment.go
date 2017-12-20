@@ -7,57 +7,6 @@ import (
 	"github.com/almerlucke/glisp/types/symbols"
 )
 
-// DotSymbol is used for dotted lists in the reader
-var DotSymbol = &symbols.Symbol{
-	Name:     ".",
-	Reserved: true,
-}
-
-// CloseParenthesisSymbol is used to signal a closing parenthesis
-// in the OpenParenthesisMacro
-var CloseParenthesisSymbol = &symbols.Symbol{
-	Name:     ")",
-	Reserved: true,
-}
-
-// NILSymbol always references NIL instead of the symbol
-var NILSymbol = &symbols.Symbol{
-	Name:     "NIL",
-	Reserved: true,
-	Value:    types.NIL,
-}
-
-// TSymbol always references T instead of the symbol
-var TSymbol = &symbols.Symbol{
-	Name:     "T",
-	Reserved: true,
-	Value:    types.T,
-}
-
-// QuoteSymbol is used for quoted objects
-var QuoteSymbol = &symbols.Symbol{
-	Name:     "SYSTEM::QUOTE",
-	Reserved: true,
-}
-
-// BackquoteSymbol is used for backquoted objects
-var BackquoteSymbol = &symbols.Symbol{
-	Name:     "SYSTEM::BACKQUOTE",
-	Reserved: true,
-}
-
-// UnquoteSymbol is used for unquoting
-var UnquoteSymbol = &symbols.Symbol{
-	Name:     "SYSTEM::UNQUOTE",
-	Reserved: true,
-}
-
-// SpliceSymbol is used for splicing
-var SpliceSymbol = &symbols.Symbol{
-	Name:     "SYSTEM::SPLICE",
-	Reserved: true,
-}
-
 // Scope holds the bindings of a symbol to an object
 type Scope map[*symbols.Symbol]types.Object
 
@@ -68,28 +17,33 @@ type Environment struct {
 
 	// Scopes can be nested
 	scopes *list.List
+
+	// Global scope is always at the end of the list, but also keep
+	// a reference here for ease
+	globalScope Scope
 }
 
 // New returns a new environment
 func New() *Environment {
 	globalScope := make(Scope)
 	scopes := list.New()
-
 	scopes.PushFront(globalScope)
 
 	env := &Environment{
-		symTable: make(map[string]*symbols.Symbol),
-		scopes:   scopes,
+		globalScope: globalScope,
+		symTable: map[string]*symbols.Symbol{
+			NILSymbol.Name:              NILSymbol,
+			TSymbol.Name:                TSymbol,
+			DotSymbol.Name:              DotSymbol,
+			CloseParenthesisSymbol.Name: CloseParenthesisSymbol,
+			QuoteSymbol.Name:            QuoteSymbol,
+			BackquoteSymbol.Name:        BackquoteSymbol,
+			UnquoteSymbol.Name:          UnquoteSymbol,
+			SpliceSymbol.Name:           SpliceSymbol,
+			AndRestSymbol.Name:          AndRestSymbol,
+		},
+		scopes: scopes,
 	}
-
-	env.symTable[NILSymbol.Name] = NILSymbol
-	env.symTable[TSymbol.Name] = TSymbol
-	env.symTable[DotSymbol.Name] = DotSymbol
-	env.symTable[CloseParenthesisSymbol.Name] = CloseParenthesisSymbol
-	env.symTable[QuoteSymbol.Name] = QuoteSymbol
-	env.symTable[BackquoteSymbol.Name] = BackquoteSymbol
-	env.symTable[UnquoteSymbol.Name] = UnquoteSymbol
-	env.symTable[SpliceSymbol.Name] = SpliceSymbol
 
 	return env
 }
@@ -104,12 +58,37 @@ func (env *Environment) PopScope() Scope {
 	return env.scopes.Remove(env.scopes.Front()).(Scope)
 }
 
-// PushScope push a new scope
-func (env *Environment) PushScope() Scope {
-	scope := make(Scope)
+// PushScope push a scope, if scope is nil create a new one
+func (env *Environment) PushScope(scope Scope) Scope {
+	if scope == nil {
+		scope = make(Scope)
+	}
+
 	env.scopes.PushFront(scope)
 
 	return scope
+}
+
+// CaptureScope captures the scope stack flattened except for the global scope
+// if a symbol is shadowed, only capture the topmost binding
+func (env *Environment) CaptureScope() Scope {
+	scope := make(Scope)
+
+	for e := env.scopes.Front(); e.Next() != nil; e = e.Next() {
+		otherScope := e.Value.(Scope)
+		for sym, val := range otherScope {
+			if scope[sym] == nil {
+				scope[sym] = val
+			}
+		}
+	}
+
+	return scope
+}
+
+// AddGlobalBinding bind object to symbol in the global scope
+func (env *Environment) AddGlobalBinding(sym *symbols.Symbol, obj types.Object) {
+	env.globalScope[sym] = obj
 }
 
 // AddBinding bind object to symbol in the current scope
@@ -117,9 +96,20 @@ func (env *Environment) AddBinding(sym *symbols.Symbol, obj types.Object) {
 	env.scopes.Front().Value.(Scope)[sym] = obj
 }
 
-// GetBinding get binding for symbol in current scope
+// GetBinding get binding for symbol
 func (env *Environment) GetBinding(sym *symbols.Symbol) types.Object {
-	return env.scopes.Front().Value.(Scope)[sym]
+	var obj types.Object
+
+	// Go through scopes to find binding
+	for e := env.scopes.Front(); e != nil; e = e.Next() {
+		scope := e.Value.(Scope)
+		obj = scope[sym]
+		if obj != nil {
+			break
+		}
+	}
+
+	return obj
 }
 
 // GetSymbol returns a symbol or nil if not found

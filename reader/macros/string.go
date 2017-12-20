@@ -71,7 +71,7 @@ func unicodeEscape(n int, escapeChar rune, rd *reader.Reader) ([]rune, error) {
 	}
 
 	if len(rs) != n {
-		return nil, errors.New("Unicode char literal expected %d ASCII chars")
+		return nil, errors.New("unicode char literal expected %d ASCII chars")
 	}
 
 	str := fmt.Sprintf("'\\%c%s'", escapeChar, string(rs))
@@ -140,7 +140,7 @@ func StringMacro(rd *reader.Reader) (types.Object, error) {
 		if c == '"' {
 			break
 		} else if c == reader.Newline {
-			return nil, errors.New("Multiline string not allowed")
+			return nil, errors.New("multiline string not allowed")
 		} else if c == '\\' {
 			s, err := escapeSequence(rd)
 			if err != nil {

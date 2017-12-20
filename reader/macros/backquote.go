@@ -21,7 +21,7 @@ func BackquoteMacro(rd *reader.Reader) (types.Object, error) {
 		obj, err = rd.ReadObject()
 		if err != nil {
 			if err == io.EOF {
-				return nil, errors.New("End of stream before end of backquote")
+				return nil, errors.New("end of stream before end of backquote")
 			}
 			return nil, err
 		}

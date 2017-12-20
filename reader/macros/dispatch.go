@@ -21,7 +21,7 @@ func DispatchMacro(rd *reader.Reader) (types.Object, error) {
 
 	if err != nil {
 		if err == io.EOF {
-			return nil, errors.New("End of file reached before end of dispatch macro")
+			return nil, errors.New("end of stream reached before end of dispatch macro")
 		}
 
 		return nil, err
@@ -32,7 +32,7 @@ func DispatchMacro(rd *reader.Reader) (types.Object, error) {
 	r, c, err := rd.ReadChar()
 	if err != nil {
 		if err == io.EOF {
-			return nil, errors.New("End of file reached before end of dispatch macro")
+			return nil, errors.New("end of stream reached before end of dispatch macro")
 		}
 
 		return nil, err
@@ -40,7 +40,7 @@ func DispatchMacro(rd *reader.Reader) (types.Object, error) {
 
 	macro := rd.DispatchMacroForCharacter(c)
 	if macro == nil {
-		return nil, fmt.Errorf("Undefined dispatch macro character %c", r)
+		return nil, fmt.Errorf("undefined dispatch macro character %c", r)
 	}
 
 	return macro(uint64(arg), rd)

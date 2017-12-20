@@ -16,7 +16,7 @@ import (
 func main() {
 	env := glisp.CreateDefaultEnvironment()
 
-	fmt.Printf("\nGlisp v0.1 -- use (exit) to quit\n\n> ")
+	fmt.Printf("\nGLISP v0.1 -- use (exit) to quit\n\n> ")
 
 	scanner := bufio.NewScanner(os.Stdin)
 

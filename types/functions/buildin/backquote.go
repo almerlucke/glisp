@@ -11,75 +11,79 @@ import (
 )
 
 func expansion(obj types.Object, env *environment.Environment) (types.Object, error) {
-	if obj.Type() == types.Cons {
-		builder := cons.ListBuilder{}
-
-		for e := obj; e.Type() == types.Cons; e = e.(*cons.Cons).Cdr {
-			car := e.(*cons.Cons).Car
-
-			if car.Type() == types.Cons {
-				l := car.(*cons.Cons)
-
-				if l.Car == environment.UnquoteSymbol {
-					// Unquote arg
-					if l.Cdr.Type() != types.Cons {
-						return nil, errors.New("Unquote needs one argument")
-					}
-
-					result, err := evaluator.Eval(l.Cdr.(*cons.Cons).Car, env)
-					if err != nil {
-						return nil, err
-					}
-
-					builder.PushBackObject(result)
-				} else if l.Car == environment.SpliceSymbol {
-					// Splice arg
-					if l.Cdr.Type() != types.Cons {
-						return nil, errors.New("Splice needs one argument")
-					}
-
-					result, err := evaluator.Eval(l.Cdr.(*cons.Cons).Car, env)
-					if err != nil {
-						return nil, err
-					}
-
-					if result.Type() != types.Cons {
-						return nil, errors.New("Splice result must be a list")
-					}
-
-					builder.Append(result.(*cons.Cons))
-				} else if l.Car == environment.BackquoteSymbol {
-					// Recursively call backquote
-					if l.Cdr.Type() != types.Cons {
-						return nil, errors.New("Backquote needs one argument")
-					}
-
-					result, err := Backquote(l.Cdr.(*cons.Cons), env)
-					if err != nil {
-						return nil, err
-					}
-
-					builder.PushBackObject(result)
-				} else {
-					// Expand list
-					result, err := expansion(l, env)
-					if err != nil {
-						return nil, err
-					}
-
-					builder.PushBackObject(result)
-				}
-			} else {
-				// No expansion needed
-				builder.PushBackObject(car)
-			}
-		}
-
-		return builder.Head, nil
+	if obj.Type() != types.Cons {
+		// If not a cons just return the object unevaluated
+		return obj, nil
 	}
 
-	// If not a cons just return the object unevaluated
-	return obj, nil
+	builder := cons.ListBuilder{}
+
+	err := obj.(*cons.Cons).Iter(func(car types.Object, index uint64) error {
+		if car.Type() == types.Cons {
+			l := car.(*cons.Cons)
+
+			if l.Car == environment.UnquoteSymbol {
+				// Unquote arg
+				if l.Cdr.Type() != types.Cons {
+					return errors.New("unquote needs one argument")
+				}
+
+				result, err := evaluator.Eval(l.Cdr.(*cons.Cons).Car, env)
+				if err != nil {
+					return err
+				}
+
+				builder.PushBackObject(result)
+			} else if l.Car == environment.SpliceSymbol {
+				// Splice arg
+				if l.Cdr.Type() != types.Cons {
+					return errors.New("splice needs one argument")
+				}
+
+				result, err := evaluator.Eval(l.Cdr.(*cons.Cons).Car, env)
+				if err != nil {
+					return err
+				}
+
+				if result.Type() != types.Cons {
+					return errors.New("splice result must be a list")
+				}
+
+				builder.Append(result.(*cons.Cons))
+			} else if l.Car == environment.BackquoteSymbol {
+				// Recursively call backquote
+				if l.Cdr.Type() != types.Cons {
+					return errors.New("backquote needs one argument")
+				}
+
+				result, err := Backquote(l.Cdr.(*cons.Cons), env)
+				if err != nil {
+					return err
+				}
+
+				builder.PushBackObject(result)
+			} else {
+				// Expand list
+				result, err := expansion(l, env)
+				if err != nil {
+					return err
+				}
+
+				builder.PushBackObject(result)
+			}
+		} else {
+			// No expansion needed
+			builder.PushBackObject(car)
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return builder.Head, nil
 }
 
 // Backquote buildin function
@@ -97,17 +101,17 @@ func Backquote(args *cons.Cons, env *environment.Environment) (types.Object, err
 	if l.Car == environment.UnquoteSymbol {
 		// Unquote arg
 		if l.Cdr.Type() != types.Cons {
-			return nil, errors.New("Unquote needs one argument")
+			return nil, errors.New("unquote needs one argument")
 		}
 
 		return evaluator.Eval(l.Cdr.(*cons.Cons).Car, env)
 	} else if l.Car == environment.SpliceSymbol {
 		// Splice arg outside list context is an error
-		return nil, errors.New("Splice can only be evaluated in a list context")
+		return nil, errors.New("splice can only be evaluated in a list context")
 	} else if l.Car == environment.BackquoteSymbol {
 		// Recursively call backquote
 		if l.Cdr.Type() != types.Cons {
-			return nil, errors.New("Backquote needs one argument")
+			return nil, errors.New("backquote needs one argument")
 		}
 
 		return Backquote(l.Cdr.(*cons.Cons), env)

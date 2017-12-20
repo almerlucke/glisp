@@ -21,7 +21,7 @@ func Car(args *cons.Cons, env *environment.Environment) (types.Object, error) {
 		return obj.(*cons.Cons).Car, nil
 	}
 
-	return nil, errors.New("Car expects a list as argument")
+	return nil, errors.New("car expects a list as argument")
 }
 
 // CreateBuildinCar creates a buildin function object

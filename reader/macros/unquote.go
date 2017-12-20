@@ -14,7 +14,7 @@ import (
 // UnquoteMacro used for , and ,@ forms in a backquote form
 func UnquoteMacro(rd *reader.Reader) (types.Object, error) {
 	if rd.BackquoteDepth == 0 {
-		return nil, errors.New("Unquote and splice can only be used in a backquote form")
+		return nil, errors.New("unquote and splice can only be used in a backquote form")
 	}
 
 	splice := false
@@ -22,7 +22,7 @@ func UnquoteMacro(rd *reader.Reader) (types.Object, error) {
 	r, _, err := rd.ReadChar()
 	if err != nil {
 		if err == io.EOF {
-			return nil, errors.New("End of stream before end of unquote")
+			return nil, errors.New("end of stream reached before end of unquote")
 		}
 
 		return nil, err
@@ -45,10 +45,10 @@ func UnquoteMacro(rd *reader.Reader) (types.Object, error) {
 		if err != nil {
 			if err == io.EOF {
 				if splice {
-					return nil, errors.New("End of stream before end of splice")
+					return nil, errors.New("end of stream reached before end of splice")
 				}
 
-				return nil, errors.New("End of stream before end of unquote")
+				return nil, errors.New("end of stream reached before end of unquote")
 			}
 
 			return nil, err

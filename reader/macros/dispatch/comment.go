@@ -10,7 +10,7 @@ import (
 
 func commentErr(err error) error {
 	if err == io.EOF {
-		return errors.New("End of stream reached before end of comment")
+		return errors.New("end of stream reached before end of comment")
 	}
 
 	return err

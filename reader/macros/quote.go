@@ -19,7 +19,7 @@ func QuoteMacro(rd *reader.Reader) (types.Object, error) {
 		obj, err = rd.ReadObject()
 		if err != nil {
 			if err == io.EOF {
-				return nil, errors.New("End of stream before end of quote")
+				return nil, errors.New("end of stream reached before end of quote")
 			}
 			return nil, err
 		}

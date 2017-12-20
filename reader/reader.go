@@ -88,7 +88,7 @@ type Reader struct {
 
 // Error specific for the reader
 func (reader *Reader) Error(msg string) error {
-	return fmt.Errorf("Error on line %d, char %d: %s",
+	return fmt.Errorf("error on line %d, char %d: %s",
 		reader.lineCount+1,
 		reader.charCount+1,
 		msg,
@@ -293,7 +293,7 @@ func (reader *Reader) parseToken() (types.Object, error) {
 		if err != nil {
 			if err == io.EOF {
 				if singleEscapeActive || multipleEscapeActive {
-					return nil, errors.New("EOF reached before end of escape")
+					return nil, errors.New("end of stream reached before end of escape")
 				}
 
 				break
@@ -303,7 +303,7 @@ func (reader *Reader) parseToken() (types.Object, error) {
 		}
 
 		if ci == nil {
-			return nil, fmt.Errorf("Illegal character %c found", c)
+			return nil, fmt.Errorf("illegal character %c found", c)
 		}
 
 		if singleEscapeActive {
@@ -359,7 +359,7 @@ func (reader *Reader) ReadObject() (types.Object, error) {
 	}
 
 	if ci == nil {
-		return nil, fmt.Errorf("Illegal character %c found", c)
+		return nil, fmt.Errorf("illegal character %c found", c)
 	}
 
 	var obj types.Object
@@ -395,7 +395,7 @@ func (reader *Reader) ReadObject() (types.Object, error) {
 				return reader.ReadObject()
 			}
 		} else {
-			return nil, fmt.Errorf("No macro function attached to macro char %c", c)
+			return nil, fmt.Errorf("no macro function attached to macro char %c", c)
 		}
 	}
 

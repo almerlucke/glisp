@@ -11,29 +11,18 @@ import (
 	"github.com/almerlucke/glisp/types/symbols"
 )
 
-// EvalArgs evaluate a list of arguments
-func EvalArgs(c *cons.Cons, env *environment.Environment) (*cons.Cons, error) {
-	// Evaluate arguments first by mapping eval
-	return c.Map(func(obj types.Object) (types.Object, error) {
-		r, err := Eval(obj, env)
-		if err != nil {
-			return nil, err
-		}
-
-		return r, nil
-	})
-}
-
 // Eval a lisp object in the given environment
 func Eval(obj types.Object, env *environment.Environment) (types.Object, error) {
 	result := obj
 
 	switch obj.Type() {
+
 	case types.Symbol:
 		result = env.GetBinding(obj.(*symbols.Symbol))
 		if result == nil {
-			return nil, fmt.Errorf("Unbound symbol %v", obj)
+			return nil, fmt.Errorf("unbound symbol %v", obj)
 		}
+
 	case types.Cons:
 		// List to evaluate
 		c := obj.(*cons.Cons)
@@ -46,7 +35,7 @@ func Eval(obj types.Object, env *environment.Environment) (types.Object, error) 
 
 		// Must be a function
 		if r.Type() != types.Function {
-			return nil, fmt.Errorf("Eval %v is not a function", r)
+			return nil, fmt.Errorf("eval %v is not a function", r)
 		}
 
 		fun := r.(function.Function)
@@ -54,12 +43,12 @@ func Eval(obj types.Object, env *environment.Environment) (types.Object, error) 
 		// Check for pure and get length
 		pure, length := c.Info()
 		if !pure {
-			return nil, errors.New("Eval can't evaluate a dotted list")
+			return nil, errors.New("eval can't evaluate a dotted list")
 		}
 
 		// Check if we have enough arguments
 		if (length - 1) < int64(fun.NumArgs()) {
-			return nil, fmt.Errorf("Not enough arguments to function %v", c.Car)
+			return nil, fmt.Errorf("not enough arguments to function %v", c.Car)
 		}
 
 		// If we need to first evaluate all args
@@ -67,7 +56,10 @@ func Eval(obj types.Object, env *environment.Environment) (types.Object, error) 
 		if c.Cdr != types.NIL {
 			args = c.Cdr.(*cons.Cons)
 			if fun.EvalArgs() {
-				args, err = EvalArgs(args, env)
+				args, err = args.Map(func(obj types.Object) (types.Object, error) {
+					return Eval(obj, env)
+				})
+
 				if err != nil {
 					return nil, err
 				}

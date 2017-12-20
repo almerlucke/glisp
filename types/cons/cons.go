@@ -48,6 +48,17 @@ func (c *Cons) String() string {
 	return str
 }
 
+// Last returns last linked cons
+func (c *Cons) Last() *Cons {
+	// Get last cons from c
+	last := c
+
+	for ; last.Cdr.Type() == types.Cons; last = last.Cdr.(*Cons) {
+	}
+
+	return last
+}
+
 // IsPureList performs a check if the list is a pure list, so last atom
 // is NIL
 func (c *Cons) IsPureList() bool {
@@ -88,18 +99,20 @@ func (c *Cons) Info() (bool, int64) {
 // Map maps a function over a cons and returns a new cons
 func (c *Cons) Map(fun MapFun) (*Cons, error) {
 	builder := ListBuilder{}
-	var e types.Object = c
 
-	for ; e.Type() == types.Cons; e = e.(*Cons).Cdr {
-		car, err := fun(e.(*Cons).Car)
+	err := c.Iter(func(obj types.Object, index uint64) error {
+		car, err := fun(obj)
 		if err != nil {
-			return nil, err
+			return err
 		}
 
-		builder.PushBack(&Cons{
-			Car: car,
-			Cdr: types.NIL,
-		})
+		builder.PushBackObject(car)
+
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
 	}
 
 	return builder.Head, nil
@@ -108,6 +121,7 @@ func (c *Cons) Map(fun MapFun) (*Cons, error) {
 // Iter over a list
 func (c *Cons) Iter(fun IterFun) error {
 	index := uint64(0)
+
 	for e := types.Object(c); e.Type() == types.Cons; e = e.(*Cons).Cdr {
 		err := fun(e.(*Cons).Car, index)
 		if err != nil {
@@ -153,18 +167,13 @@ func (builder *ListBuilder) PushBack(c *Cons) {
 	builder.Tail = c
 }
 
-// Append more than one cons on the list
+// Append a list of conses
 func (builder *ListBuilder) Append(c *Cons) {
-	// Get last cons from c
-	e := c
-	for ; e.Cdr.Type() == types.Cons; e = e.Cdr.(*Cons) {
-	}
-
 	if builder.Head == nil {
 		builder.Head = c
 	} else {
 		builder.Tail.Cdr = c
 	}
 
-	builder.Tail = e
+	builder.Tail = c.Last()
 }

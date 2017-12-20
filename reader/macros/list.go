@@ -22,7 +22,7 @@ func OpenParenthesisMacro(reader *reader.Reader) (types.Object, error) {
 		obj, err := reader.ReadObject()
 		if err != nil {
 			if err == io.EOF {
-				return nil, errors.New("Unmatched parenthesis")
+				return nil, errors.New("unmatched parenthesis")
 			}
 
 			return nil, err
@@ -30,7 +30,7 @@ func OpenParenthesisMacro(reader *reader.Reader) (types.Object, error) {
 
 		if obj == environment.CloseParenthesisSymbol {
 			if dotFound && dottedObjCnt != 1 {
-				return nil, errors.New("Expected one object after dot")
+				return nil, errors.New("expected one object after dot")
 			}
 
 			break
@@ -41,7 +41,7 @@ func OpenParenthesisMacro(reader *reader.Reader) (types.Object, error) {
 		} else if obj != nil {
 			if dotFound {
 				if builder.Tail == nil {
-					return nil, errors.New("Expected at least one object before dot")
+					return nil, errors.New("expected at least one object before dot")
 				}
 				dottedObjCnt++
 				builder.Tail.Cdr = obj
@@ -66,7 +66,7 @@ func OpenParenthesisMacro(reader *reader.Reader) (types.Object, error) {
 // CloseParenthesisMacro is called when a closing parenthesis is encountered
 func CloseParenthesisMacro(reader *reader.Reader) (types.Object, error) {
 	if reader.Depth == 0 {
-		return nil, errors.New("Unmatched parenthesis")
+		return nil, errors.New("unmatched parenthesis")
 	}
 
 	return environment.CloseParenthesisSymbol, nil

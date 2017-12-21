@@ -9,23 +9,16 @@ import (
 	"github.com/almerlucke/glisp/types"
 	"github.com/almerlucke/glisp/types/cons"
 	"github.com/almerlucke/glisp/types/functions"
+	"github.com/almerlucke/glisp/types/functions/function"
 	"github.com/almerlucke/glisp/types/symbols"
 )
 
-// Assign buildin function
-func Assign(args *cons.Cons, env *environment.Environment) (types.Object, error) {
-	if args.Car.Type() != types.Symbol {
-		return nil, errors.New("= expected a symbol as first argument")
-	}
-
-	sym := args.Car.(*symbols.Symbol)
-
+func symbolAssign(sym *symbols.Symbol, val types.Object, env *environment.Environment) (types.Object, error) {
 	if sym.Reserved {
 		return nil, fmt.Errorf("can't assign to a reserved symbol %v", sym)
 	}
 
-	args = args.Cdr.(*cons.Cons)
-	val, err := evaluator.Eval(args.Car, env)
+	val, err := evaluator.Eval(val, env)
 	if err != nil {
 		return nil, err
 	}
@@ -36,6 +29,70 @@ func Assign(args *cons.Cons, env *environment.Environment) (types.Object, error)
 	}
 
 	return val, nil
+}
+
+func expressionAssign(c *cons.Cons, val types.Object, env *environment.Environment) (types.Object, error) {
+	r, err := evaluator.Eval(c.Car, env)
+	if err != nil {
+		return nil, err
+	}
+
+	if r.Type() != types.Function {
+		return nil, fmt.Errorf("can't assign to %v", r)
+	}
+
+	assignable, ok := r.(function.Assignable)
+	if !ok {
+		return nil, fmt.Errorf("can't assign to %v", r)
+	}
+
+	// Check for pure and get length
+	pure, length := c.Info()
+	if !pure {
+		return nil, errors.New("assign can't evaluate a dotted list")
+	}
+
+	// Check if we have enough arguments
+	if (length - 1) < int64(assignable.NumArgs()) {
+		return nil, fmt.Errorf("not enough arguments to function %v", c.Car)
+	}
+
+	// If we need to first evaluate all args
+	var args *cons.Cons
+	if c.Cdr != types.NIL {
+		args = c.Cdr.(*cons.Cons)
+		if assignable.EvalArgs() {
+			args, err = args.Map(func(obj types.Object) (types.Object, error) {
+				return evaluator.Eval(obj, env)
+			})
+
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	// Evaluate assign value if needed
+	if assignable.EvalArgs() {
+		val, err = evaluator.Eval(val, env)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return assignable.Assign(args, val, env)
+}
+
+// Assign buildin function
+func Assign(args *cons.Cons, env *environment.Environment) (types.Object, error) {
+	switch args.Car.Type() {
+	case types.Symbol:
+		return symbolAssign(args.Car.(*symbols.Symbol), args.Cdr.(*cons.Cons).Car, env)
+	case types.Cons:
+		return expressionAssign(args.Car.(*cons.Cons), args.Cdr.(*cons.Cons).Car, env)
+	}
+
+	return nil, fmt.Errorf("can't assign to %v", args.Car)
 }
 
 // CreateBuildinAssign creates a buildin function object

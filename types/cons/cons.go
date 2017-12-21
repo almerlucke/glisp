@@ -134,6 +134,37 @@ func (c *Cons) Iter(fun IterFun) error {
 	return nil
 }
 
+// Access access the nth element
+func (c *Cons) Access(nth uint64) types.Object {
+	index := uint64(0)
+
+	for e := types.Object(c); e.Type() == types.Cons; e = e.(*Cons).Cdr {
+		if index == nth {
+			return e.(*Cons).Car
+		}
+
+		index++
+	}
+
+	return nil
+}
+
+// Assign a new value to the nth cons car
+func (c *Cons) Assign(nth uint64, val types.Object) bool {
+	index := uint64(0)
+
+	for e := types.Object(c); e.Type() == types.Cons; e = e.(*Cons).Cdr {
+		if index == nth {
+			e.(*Cons).Car = val
+			return true
+		}
+
+		index++
+	}
+
+	return false
+}
+
 // ListBuilder can be used to build lists of cons objects
 type ListBuilder struct {
 	Head *Cons

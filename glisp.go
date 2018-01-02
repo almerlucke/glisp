@@ -18,8 +18,8 @@ var DefaultDispatchTable = generateDefaultDispatchTable()
 func CreateDefaultEnvironment() *environment.Environment {
 	env := environment.New()
 
-	env.Context["defaultReadTable"] = DefaultReadTable
-	env.Context["defaultDispatchTable"] = DefaultDispatchTable
+	env.Context()["defaultReadTable"] = DefaultReadTable
+	env.Context()["defaultDispatchTable"] = DefaultDispatchTable
 
 	env.AddGlobalBinding(environment.QuoteSymbol, buildin.CreateBuildinQuote())
 	env.AddGlobalBinding(environment.BackquoteSymbol, buildin.CreateBuildinBackquote())
@@ -39,6 +39,7 @@ func CreateDefaultEnvironment() *environment.Environment {
 	env.AddGlobalBinding(env.DefineSymbol("SCOPE", true, nil), buildin.CreateBuildinScope())
 	env.AddGlobalBinding(env.DefineSymbol("EVAL", true, nil), buildin.CreateBuildinEval())
 	env.AddGlobalBinding(env.DefineSymbol("ELT", true, nil), buildin.CreateBuildinElt())
+	env.AddGlobalBinding(env.DefineSymbol("HASHTABLE", true, nil), buildin.CreateBuildinHashTable())
 
 	return env
 }

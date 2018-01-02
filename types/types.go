@@ -20,12 +20,19 @@ const (
 	Number
 	// Function object type
 	Function
+	// HashTable object type
+	HashTable
 )
 
 // Object interface, every Lisp object must implement these methods
 type Object interface {
 	fmt.Stringer
 	Type() Type
+}
+
+// Comparable object that can be compared
+type Comparable interface {
+	Compare(Comparable) bool
 }
 
 // Nil is an empty struct, there will only be one Nil struct created, the

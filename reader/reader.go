@@ -5,12 +5,13 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"reflect"
 	"regexp"
 	"strconv"
 	"unicode"
 
-	"github.com/almerlucke/glisp/environment"
+	"github.com/almerlucke/glisp/interfaces/environment"
 	"github.com/almerlucke/glisp/types"
 	"github.com/almerlucke/glisp/types/numbers"
 )
@@ -81,7 +82,7 @@ type Reader struct {
 	dispatchTable  DispatchTable
 	lineCount      int
 	charCount      int
-	env            *environment.Environment
+	env            environment.Environment
 	Depth          int
 	BackquoteDepth int
 }
@@ -105,7 +106,7 @@ func (reader *Reader) ErrorWithError(err error) error {
 }
 
 // New creates a new reader
-func New(scanner io.RuneScanner, readTable ReadTable, dispatchTable DispatchTable, env *environment.Environment) *Reader {
+func New(scanner io.RuneScanner, readTable ReadTable, dispatchTable DispatchTable, env environment.Environment) *Reader {
 	return &Reader{
 		scanner:       scanner,
 		readTable:     readTable,
@@ -152,6 +153,7 @@ func (reader *Reader) ReadChar() (rune, *Character, error) {
 }
 
 func (reader *Reader) newLine() {
+	log.Printf("newline\n")
 	reader.lineCount++
 	reader.charCount = 0
 }

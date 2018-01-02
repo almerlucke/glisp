@@ -3,14 +3,14 @@ package buildin
 import (
 	"errors"
 
-	"github.com/almerlucke/glisp/environment"
+	"github.com/almerlucke/glisp/interfaces/environment"
 	"github.com/almerlucke/glisp/types"
 	"github.com/almerlucke/glisp/types/cons"
 	"github.com/almerlucke/glisp/types/functions"
 )
 
 // Car buildin function
-func Car(args *cons.Cons, env *environment.Environment) (types.Object, error) {
+func Car(args *cons.Cons, env environment.Environment) (types.Object, error) {
 	obj := args.Car
 
 	if obj == types.NIL {

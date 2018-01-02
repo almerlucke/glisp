@@ -3,7 +3,7 @@ package buildin
 import (
 	"errors"
 
-	"github.com/almerlucke/glisp/environment"
+	"github.com/almerlucke/glisp/interfaces/environment"
 	"github.com/almerlucke/glisp/types"
 	"github.com/almerlucke/glisp/types/cons"
 	"github.com/almerlucke/glisp/types/functions"
@@ -11,7 +11,7 @@ import (
 )
 
 // Elt buildin function
-func Elt(args *cons.Cons, env *environment.Environment) (types.Object, error) {
+func Elt(args *cons.Cons, env environment.Environment) (types.Object, error) {
 	if args.Car.Type() != types.Cons {
 		return nil, errors.New("elt expected a list as first argument")
 	}
@@ -38,7 +38,7 @@ func Elt(args *cons.Cons, env *environment.Environment) (types.Object, error) {
 }
 
 // EltAssign assignable version of Elt
-func EltAssign(args *cons.Cons, val types.Object, env *environment.Environment) (types.Object, error) {
+func EltAssign(args *cons.Cons, val types.Object, env environment.Environment) (types.Object, error) {
 	if args.Car.Type() != types.Cons {
 		return nil, errors.New("elt expected a list as first argument")
 	}

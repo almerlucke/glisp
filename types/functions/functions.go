@@ -3,18 +3,20 @@ package functions
 import (
 	"fmt"
 
-	"github.com/almerlucke/glisp/environment"
+	defaultEnvironment "github.com/almerlucke/glisp/environment"
 	"github.com/almerlucke/glisp/evaluator"
+	"github.com/almerlucke/glisp/interfaces/environment"
+	"github.com/almerlucke/glisp/scope"
 	"github.com/almerlucke/glisp/types"
 	"github.com/almerlucke/glisp/types/cons"
 	"github.com/almerlucke/glisp/types/symbols"
 )
 
 // AssignableFunctionImp assign function implementation
-type AssignableFunctionImp func(*cons.Cons, types.Object, *environment.Environment) (types.Object, error)
+type AssignableFunctionImp func(*cons.Cons, types.Object, environment.Environment) (types.Object, error)
 
 // BuildinFunctionImp build in function implementation
-type BuildinFunctionImp func(*cons.Cons, *environment.Environment) (types.Object, error)
+type BuildinFunctionImp func(*cons.Cons, environment.Environment) (types.Object, error)
 
 // BuildinFunction object
 type BuildinFunction struct {
@@ -48,7 +50,7 @@ func (fun *BuildinFunction) Type() types.Type {
 }
 
 // Eval evaluates a function
-func (fun *BuildinFunction) Eval(args *cons.Cons, env *environment.Environment) (types.Object, error) {
+func (fun *BuildinFunction) Eval(args *cons.Cons, env environment.Environment) (types.Object, error) {
 	return fun.imp(args, env)
 }
 
@@ -72,19 +74,19 @@ func NewAssignableFunction(imp BuildinFunctionImp, assignImp AssignableFunctionI
 }
 
 // Assign call
-func (fun *AssignableFunction) Assign(args *cons.Cons, val types.Object, env *environment.Environment) (types.Object, error) {
+func (fun *AssignableFunction) Assign(args *cons.Cons, val types.Object, env environment.Environment) (types.Object, error) {
 	return fun.assignImp(args, val, env)
 }
 
 // LambdaFunction anonymous function
 type LambdaFunction struct {
 	argList       []*symbols.Symbol
-	capturedScope environment.Scope
+	capturedScope scope.Scope
 	body          *cons.Cons
 }
 
 // NewLambdaFunction creates a new lambda function
-func NewLambdaFunction(argList []*symbols.Symbol, capturedScope environment.Scope, body *cons.Cons) *LambdaFunction {
+func NewLambdaFunction(argList []*symbols.Symbol, capturedScope scope.Scope, body *cons.Cons) *LambdaFunction {
 	return &LambdaFunction{
 		argList:       argList,
 		capturedScope: capturedScope,
@@ -113,7 +115,7 @@ func (fun *LambdaFunction) String() string {
 }
 
 // Eval lambda function evaluation
-func (fun *LambdaFunction) Eval(args *cons.Cons, env *environment.Environment) (types.Object, error) {
+func (fun *LambdaFunction) Eval(args *cons.Cons, env environment.Environment) (types.Object, error) {
 	// First push captured scope
 	env.PushScope(fun.capturedScope)
 
@@ -143,9 +145,9 @@ func (fun *LambdaFunction) Eval(args *cons.Cons, env *environment.Environment) (
 
 	// Add binding for &rest symbol with remaining args
 	if args != nil {
-		env.AddBinding(environment.AndRestSymbol, args)
+		env.AddBinding(defaultEnvironment.AndRestSymbol, args)
 	} else {
-		env.AddBinding(environment.AndRestSymbol, types.NIL)
+		env.AddBinding(defaultEnvironment.AndRestSymbol, types.NIL)
 	}
 
 	// Evaluate body

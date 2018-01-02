@@ -29,14 +29,14 @@ func main() {
 		for err == nil {
 			result, err = evaluator.Eval(obj, env)
 			if err != nil {
-				fmt.Printf("<! %v >\n", rd.ErrorWithError(err))
+				fmt.Printf("<! %v >\n", err)
 			}
 
 			obj, err = rd.ReadObject()
 		}
 
 		if err != nil && err != io.EOF {
-			fmt.Printf("<! %v >\n", rd.ErrorWithError(err))
+			fmt.Printf("<! %v >\n", err)
 		}
 
 		if result != nil {

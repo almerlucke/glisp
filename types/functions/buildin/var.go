@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/almerlucke/glisp/environment"
 	"github.com/almerlucke/glisp/evaluator"
+	"github.com/almerlucke/glisp/interfaces/environment"
 	"github.com/almerlucke/glisp/types"
 	"github.com/almerlucke/glisp/types/cons"
 	"github.com/almerlucke/glisp/types/functions"
@@ -13,7 +13,7 @@ import (
 )
 
 // Var buildin function
-func Var(args *cons.Cons, env *environment.Environment) (types.Object, error) {
+func Var(args *cons.Cons, env environment.Environment) (types.Object, error) {
 	if args.Car.Type() != types.Symbol {
 		return nil, errors.New("var expected a symbol as first argument")
 	}

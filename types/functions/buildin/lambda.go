@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/almerlucke/glisp/environment"
+	"github.com/almerlucke/glisp/interfaces/environment"
 	"github.com/almerlucke/glisp/types"
 	"github.com/almerlucke/glisp/types/cons"
 	"github.com/almerlucke/glisp/types/functions"
@@ -12,7 +12,7 @@ import (
 )
 
 // Lambda buildin function
-func Lambda(args *cons.Cons, env *environment.Environment) (types.Object, error) {
+func Lambda(args *cons.Cons, env environment.Environment) (types.Object, error) {
 	argType := args.Car.Type()
 
 	// Arg list must be cons or nil

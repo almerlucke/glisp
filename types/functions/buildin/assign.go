@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/almerlucke/glisp/environment"
 	"github.com/almerlucke/glisp/evaluator"
+	"github.com/almerlucke/glisp/interfaces/environment"
 	"github.com/almerlucke/glisp/types"
 	"github.com/almerlucke/glisp/types/cons"
 	"github.com/almerlucke/glisp/types/functions"
@@ -13,7 +13,7 @@ import (
 	"github.com/almerlucke/glisp/types/symbols"
 )
 
-func symbolAssign(sym *symbols.Symbol, val types.Object, env *environment.Environment) (types.Object, error) {
+func symbolAssign(sym *symbols.Symbol, val types.Object, env environment.Environment) (types.Object, error) {
 	if sym.Reserved {
 		return nil, fmt.Errorf("can't assign to a reserved symbol %v", sym)
 	}
@@ -31,7 +31,7 @@ func symbolAssign(sym *symbols.Symbol, val types.Object, env *environment.Enviro
 	return val, nil
 }
 
-func expressionAssign(c *cons.Cons, val types.Object, env *environment.Environment) (types.Object, error) {
+func expressionAssign(c *cons.Cons, val types.Object, env environment.Environment) (types.Object, error) {
 	r, err := evaluator.Eval(c.Car, env)
 	if err != nil {
 		return nil, err
@@ -84,7 +84,7 @@ func expressionAssign(c *cons.Cons, val types.Object, env *environment.Environme
 }
 
 // Assign buildin function
-func Assign(args *cons.Cons, env *environment.Environment) (types.Object, error) {
+func Assign(args *cons.Cons, env environment.Environment) (types.Object, error) {
 	switch args.Car.Type() {
 	case types.Symbol:
 		return symbolAssign(args.Car.(*symbols.Symbol), args.Cdr.(*cons.Cons).Car, env)

@@ -90,3 +90,14 @@ func (num *Number) Int64Value() int64 {
 
 	return val
 }
+
+// Compare for comparable interface
+func (num *Number) Compare(obj types.Comparable) bool {
+	otherNum, ok := obj.(*Number)
+
+	if !ok {
+		return false
+	}
+
+	return num.Value == otherNum.Value
+}

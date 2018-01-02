@@ -1,4 +1,3 @@
-
 (scope
   (var a '(1 2 3 4))
   (print (elt a 0))

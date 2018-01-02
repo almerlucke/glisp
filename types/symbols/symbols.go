@@ -23,3 +23,8 @@ func (sym *Symbol) Type() types.Type {
 func (sym *Symbol) String() string {
 	return sym.Name
 }
+
+// Compare for comparable interface
+func (sym *Symbol) Compare(obj types.Comparable) bool {
+	return sym == obj
+}

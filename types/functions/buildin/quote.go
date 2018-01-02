@@ -1,14 +1,14 @@
 package buildin
 
 import (
-	"github.com/almerlucke/glisp/environment"
+	"github.com/almerlucke/glisp/interfaces/environment"
 	"github.com/almerlucke/glisp/types"
 	"github.com/almerlucke/glisp/types/cons"
 	"github.com/almerlucke/glisp/types/functions"
 )
 
 // Quote buildin function
-func Quote(args *cons.Cons, env *environment.Environment) (types.Object, error) {
+func Quote(args *cons.Cons, env environment.Environment) (types.Object, error) {
 	return args.Car, nil
 }
 

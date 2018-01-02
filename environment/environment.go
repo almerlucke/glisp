@@ -4,12 +4,10 @@ import (
 	"container/list"
 	"fmt"
 
+	"github.com/almerlucke/glisp/scope"
 	"github.com/almerlucke/glisp/types"
 	"github.com/almerlucke/glisp/types/symbols"
 )
-
-// Scope holds the bindings of a symbol to an object
-type Scope map[*symbols.Symbol]types.Object
 
 // Environment holds the currently defined symbols and the binding scopes
 type Environment struct {
@@ -21,15 +19,15 @@ type Environment struct {
 
 	// Global scope is always at the end of the list, but also keep
 	// a reference here for ease
-	globalScope Scope
+	globalScope scope.Scope
 
 	// Context can hold all kinds of values
-	Context map[string]interface{}
+	context map[string]interface{}
 }
 
 // New returns a new environment
 func New() *Environment {
-	globalScope := make(Scope)
+	globalScope := make(scope.Scope)
 	scopes := list.New()
 	scopes.PushFront(globalScope)
 
@@ -47,48 +45,48 @@ func New() *Environment {
 			AndRestSymbol.Name:          AndRestSymbol,
 		},
 		scopes:  scopes,
-		Context: map[string]interface{}{},
+		context: map[string]interface{}{},
 	}
 
 	return env
 }
 
 // CurrentScope returns the current scope
-func (env *Environment) CurrentScope() Scope {
-	return env.scopes.Front().Value.(Scope)
+func (env *Environment) CurrentScope() scope.Scope {
+	return env.scopes.Front().Value.(scope.Scope)
 }
 
 // PopScope pop a scope
-func (env *Environment) PopScope() Scope {
-	return env.scopes.Remove(env.scopes.Front()).(Scope)
+func (env *Environment) PopScope() scope.Scope {
+	return env.scopes.Remove(env.scopes.Front()).(scope.Scope)
 }
 
 // PushScope push a scope, if scope is nil create a new one
-func (env *Environment) PushScope(scope Scope) Scope {
-	if scope == nil {
-		scope = make(Scope)
+func (env *Environment) PushScope(s scope.Scope) scope.Scope {
+	if s == nil {
+		s = make(scope.Scope)
 	}
 
-	env.scopes.PushFront(scope)
+	env.scopes.PushFront(s)
 
-	return scope
+	return s
 }
 
 // CaptureScope captures the scope stack flattened except for the global scope
 // if a symbol is shadowed, only capture the topmost binding
-func (env *Environment) CaptureScope() Scope {
-	scope := make(Scope)
+func (env *Environment) CaptureScope() scope.Scope {
+	s := make(scope.Scope)
 
 	for e := env.scopes.Front(); e.Next() != nil; e = e.Next() {
-		otherScope := e.Value.(Scope)
+		otherScope := e.Value.(scope.Scope)
 		for sym, val := range otherScope {
-			if scope[sym] == nil {
-				scope[sym] = val
+			if s[sym] == nil {
+				s[sym] = val
 			}
 		}
 	}
 
-	return scope
+	return s
 }
 
 // AddGlobalBinding bind object to symbol in the global scope
@@ -98,7 +96,7 @@ func (env *Environment) AddGlobalBinding(sym *symbols.Symbol, obj types.Object) 
 
 // AddBinding bind object to symbol in the current scope
 func (env *Environment) AddBinding(sym *symbols.Symbol, obj types.Object) {
-	env.scopes.Front().Value.(Scope)[sym] = obj
+	env.scopes.Front().Value.(scope.Scope)[sym] = obj
 }
 
 // GetBinding get binding for symbol
@@ -107,8 +105,8 @@ func (env *Environment) GetBinding(sym *symbols.Symbol) types.Object {
 
 	// Go through scopes to find binding
 	for e := env.scopes.Front(); e != nil; e = e.Next() {
-		scope := e.Value.(Scope)
-		obj = scope[sym]
+		s := e.Value.(scope.Scope)
+		obj = s[sym]
 		if obj != nil {
 			break
 		}
@@ -121,10 +119,10 @@ func (env *Environment) GetBinding(sym *symbols.Symbol) types.Object {
 func (env *Environment) SetBinding(sym *symbols.Symbol, obj types.Object) error {
 	// Go through scopes to find binding
 	for e := env.scopes.Front(); e != nil; e = e.Next() {
-		scope := e.Value.(Scope)
-		_, ok := scope[sym]
+		s := e.Value.(scope.Scope)
+		_, ok := s[sym]
 		if ok {
-			scope[sym] = obj
+			s[sym] = obj
 			return nil
 		}
 	}
@@ -153,4 +151,8 @@ func (env *Environment) DefineSymbol(name string, reserved bool, value types.Obj
 	}
 
 	return sym
+}
+
+func (env *Environment) Context() map[string]interface{} {
+	return env.context
 }

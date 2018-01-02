@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/almerlucke/glisp/environment"
+	"github.com/almerlucke/glisp/interfaces/environment"
 	"github.com/almerlucke/glisp/types"
 	"github.com/almerlucke/glisp/types/cons"
 	"github.com/almerlucke/glisp/types/functions/function"
@@ -12,7 +12,7 @@ import (
 )
 
 // Eval a lisp object in the given environment
-func Eval(obj types.Object, env *environment.Environment) (types.Object, error) {
+func Eval(obj types.Object, env environment.Environment) (types.Object, error) {
 	result := obj
 
 	switch obj.Type() {

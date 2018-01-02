@@ -6,8 +6,8 @@ import (
 	"io"
 	"os"
 
-	"github.com/almerlucke/glisp/environment"
 	"github.com/almerlucke/glisp/evaluator"
+	"github.com/almerlucke/glisp/interfaces/environment"
 	"github.com/almerlucke/glisp/reader"
 	"github.com/almerlucke/glisp/types"
 	"github.com/almerlucke/glisp/types/cons"
@@ -16,7 +16,7 @@ import (
 )
 
 // Load buildin function
-func Load(args *cons.Cons, env *environment.Environment) (types.Object, error) {
+func Load(args *cons.Cons, env environment.Environment) (types.Object, error) {
 	if args.Car.Type() != types.String {
 		return nil, errors.New("load expected a path string as first argument")
 	}
@@ -30,8 +30,8 @@ func Load(args *cons.Cons, env *environment.Environment) (types.Object, error) {
 
 	defer f.Close()
 
-	readTable := env.Context["defaultReadTable"].(reader.ReadTable)
-	dispatchTable := env.Context["defaultDispatchTable"].(reader.DispatchTable)
+	readTable := env.Context()["defaultReadTable"].(reader.ReadTable)
+	dispatchTable := env.Context()["defaultDispatchTable"].(reader.DispatchTable)
 
 	rd := reader.New(bufio.NewReader(f), readTable, dispatchTable, env)
 
@@ -41,7 +41,7 @@ func Load(args *cons.Cons, env *environment.Environment) (types.Object, error) {
 	for err == nil {
 		result, err = evaluator.Eval(obj, env)
 		if err != nil {
-			return nil, err
+			return nil, rd.ErrorWithError(err)
 		}
 
 		obj, err = rd.ReadObject()

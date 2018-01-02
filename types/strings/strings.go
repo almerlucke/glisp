@@ -18,3 +18,14 @@ func (str String) Type() types.Type {
 func (str String) String() string {
 	return fmt.Sprintf("\"%v\"", string(str))
 }
+
+// Compare for comparable interface
+func (str String) Compare(obj types.Comparable) bool {
+	otherStr, ok := obj.(String)
+
+	if !ok {
+		return false
+	}
+
+	return str == otherStr
+}

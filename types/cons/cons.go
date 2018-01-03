@@ -1,16 +1,12 @@
 package cons
 
 import (
+	"bytes"
 	"fmt"
 
+	"github.com/almerlucke/glisp/interfaces/sequence"
 	"github.com/almerlucke/glisp/types"
 )
-
-// MapFun function to be mapped
-type MapFun func(obj types.Object) (types.Object, error)
-
-// IterFun function to iterate over list
-type IterFun func(obj types.Object, index uint64) error
 
 // Cons is the main list structure
 type Cons struct {
@@ -25,27 +21,29 @@ func (c *Cons) Type() types.Type {
 
 // String for stringer interface
 func (c *Cons) String() string {
-	str := ""
+	var buffer bytes.Buffer
 
+	first := true
 	var e types.Object = c
 
 	for ; e.Type() == types.Cons; e = e.(*Cons).Cdr {
-		if str == "" {
-			str = "("
+		if first {
+			first = false
+			buffer.WriteString("(")
 		} else {
-			str += " "
+			buffer.WriteString(" ")
 		}
 
-		str += fmt.Sprintf("%v", e.(*Cons).Car)
+		buffer.WriteString(e.(*Cons).Car.String())
 	}
 
 	if e != types.NIL {
-		str += fmt.Sprintf(" . %v)", e)
+		buffer.WriteString(fmt.Sprintf(" . %v)", e))
 	} else {
-		str += ")"
+		buffer.WriteString(")")
 	}
 
-	return str
+	return buffer.String()
 }
 
 // Last returns last linked cons
@@ -71,8 +69,8 @@ func (c *Cons) IsPureList() bool {
 }
 
 // Length of the list
-func (c *Cons) Length() int64 {
-	length := int64(0)
+func (c *Cons) Length() uint64 {
+	length := uint64(0)
 
 	var e types.Object = c
 
@@ -97,7 +95,7 @@ func (c *Cons) Info() (bool, int64) {
 }
 
 // Map maps a function over a cons and returns a new cons
-func (c *Cons) Map(fun MapFun) (*Cons, error) {
+func (c *Cons) Map(fun sequence.MapFun) (sequence.Sequence, error) {
 	builder := ListBuilder{}
 
 	err := c.Iter(func(obj types.Object, index uint64) error {
@@ -119,7 +117,7 @@ func (c *Cons) Map(fun MapFun) (*Cons, error) {
 }
 
 // Iter over a list
-func (c *Cons) Iter(fun IterFun) error {
+func (c *Cons) Iter(fun sequence.IterFun) error {
 	index := uint64(0)
 
 	for e := types.Object(c); e.Type() == types.Cons; e = e.(*Cons).Cdr {
@@ -163,48 +161,4 @@ func (c *Cons) Assign(nth uint64, val types.Object) bool {
 	}
 
 	return false
-}
-
-// ListBuilder can be used to build lists of cons objects
-type ListBuilder struct {
-	Head *Cons
-	Tail *Cons
-}
-
-// PushBackObject push back an object
-func (builder *ListBuilder) PushBackObject(obj types.Object) {
-	c := &Cons{
-		Car: obj,
-		Cdr: types.NIL,
-	}
-
-	if builder.Head == nil {
-		builder.Head = c
-	} else {
-		builder.Tail.Cdr = c
-	}
-
-	builder.Tail = c
-}
-
-// PushBack a new cons on the list
-func (builder *ListBuilder) PushBack(c *Cons) {
-	if builder.Head == nil {
-		builder.Head = c
-	} else {
-		builder.Tail.Cdr = c
-	}
-
-	builder.Tail = c
-}
-
-// Append a list of conses
-func (builder *ListBuilder) Append(c *Cons) {
-	if builder.Head == nil {
-		builder.Head = c
-	} else {
-		builder.Tail.Cdr = c
-	}
-
-	builder.Tail = c.Last()
 }

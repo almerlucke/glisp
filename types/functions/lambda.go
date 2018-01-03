@@ -3,79 +3,13 @@ package functions
 import (
 	"fmt"
 
-	globals "github.com/almerlucke/glisp/globals/symbols"
-
 	"github.com/almerlucke/glisp/interfaces/environment"
 	"github.com/almerlucke/glisp/types"
 	"github.com/almerlucke/glisp/types/cons"
 	"github.com/almerlucke/glisp/types/symbols"
+
+	globals "github.com/almerlucke/glisp/globals/symbols"
 )
-
-// AssignableFunctionImp assign function implementation
-type AssignableFunctionImp func(*cons.Cons, types.Object, environment.Environment) (types.Object, error)
-
-// BuildinFunctionImp build in function implementation
-type BuildinFunctionImp func(*cons.Cons, environment.Environment) (types.Object, error)
-
-// BuildinFunction object
-type BuildinFunction struct {
-	imp      BuildinFunctionImp
-	numArgs  int
-	evalArgs bool
-}
-
-// NewBuildinFunction creates a new build in function
-func NewBuildinFunction(imp BuildinFunctionImp, numArgs int, evalArgs bool) *BuildinFunction {
-	return &BuildinFunction{
-		imp:      imp,
-		numArgs:  numArgs,
-		evalArgs: evalArgs,
-	}
-}
-
-// NumArgs number of arguments
-func (fun *BuildinFunction) NumArgs() int {
-	return fun.numArgs
-}
-
-// EvalArgs evaluate arguments before calling eval
-func (fun *BuildinFunction) EvalArgs() bool {
-	return fun.evalArgs
-}
-
-// Type of Function
-func (fun *BuildinFunction) Type() types.Type {
-	return types.Function
-}
-
-// Eval evaluates a function
-func (fun *BuildinFunction) Eval(args *cons.Cons, env environment.Environment) (types.Object, error) {
-	return fun.imp(args, env)
-}
-
-// String for Stringer
-func (fun *BuildinFunction) String() string {
-	return fmt.Sprintf("function(%p)", fun)
-}
-
-// AssignableFunction function that implements Assignable
-type AssignableFunction struct {
-	*BuildinFunction
-	assignImp AssignableFunctionImp
-}
-
-// NewAssignableFunction creates a new assignable function
-func NewAssignableFunction(imp BuildinFunctionImp, assignImp AssignableFunctionImp, numArgs int, evalArgs bool) *AssignableFunction {
-	return &AssignableFunction{
-		BuildinFunction: NewBuildinFunction(imp, numArgs, evalArgs),
-		assignImp:       assignImp,
-	}
-}
-
-// Assign call
-func (fun *AssignableFunction) Assign(args *cons.Cons, val types.Object, env environment.Environment) (types.Object, error) {
-	return fun.assignImp(args, val, env)
-}
 
 // LambdaFunction anonymous function
 type LambdaFunction struct {

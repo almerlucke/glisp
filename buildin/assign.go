@@ -61,13 +61,15 @@ func expressionAssign(c *cons.Cons, val types.Object, env environment.Environmen
 	if c.Cdr != types.NIL {
 		args = c.Cdr.(*cons.Cons)
 		if assignable.EvalArgs() {
-			args, err = args.Map(func(obj types.Object) (types.Object, error) {
+			seq, serr := args.Map(func(obj types.Object) (types.Object, error) {
 				return env.Eval(obj)
 			})
 
-			if err != nil {
-				return nil, err
+			if serr != nil {
+				return nil, serr
 			}
+
+			args = seq.(*cons.Cons)
 		}
 	}
 

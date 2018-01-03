@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/almerlucke/glisp/interfaces/environment"
+	"github.com/almerlucke/glisp/interfaces/sequence"
 	"github.com/almerlucke/glisp/types"
 	"github.com/almerlucke/glisp/types/cons"
 	"github.com/almerlucke/glisp/types/functions"
@@ -12,15 +13,15 @@ import (
 
 // Elt buildin function
 func Elt(args *cons.Cons, env environment.Environment) (types.Object, error) {
-	if args.Car.Type() != types.Cons {
-		return nil, errors.New("elt expected a list as first argument")
-	}
+	seq, ok := args.Car.(sequence.Sequence)
 
-	l := args.Car.(*cons.Cons)
+	if !ok {
+		return nil, errors.New("elt expected a sequence as first argument")
+	}
 
 	args = args.Cdr.(*cons.Cons)
 	if args.Car.Type() != types.Number {
-		return nil, errors.New("elt expected an integer as second argument")
+		return nil, errors.New("elt expected a number as second argument")
 	}
 
 	num := args.Car.(*numbers.Number)
@@ -29,7 +30,7 @@ func Elt(args *cons.Cons, env environment.Environment) (types.Object, error) {
 		return nil, errors.New("index out of bounds")
 	}
 
-	val := l.Access(uint64(index))
+	val := seq.Access(uint64(index))
 	if val == nil {
 		return nil, errors.New("index out of bounds")
 	}
@@ -39,11 +40,11 @@ func Elt(args *cons.Cons, env environment.Environment) (types.Object, error) {
 
 // EltAssign assignable version of Elt
 func EltAssign(args *cons.Cons, val types.Object, env environment.Environment) (types.Object, error) {
-	if args.Car.Type() != types.Cons {
-		return nil, errors.New("elt expected a list as first argument")
-	}
+	seq, ok := args.Car.(sequence.Sequence)
 
-	l := args.Car.(*cons.Cons)
+	if !ok {
+		return nil, errors.New("elt expected a sequence as first argument")
+	}
 
 	args = args.Cdr.(*cons.Cons)
 	if args.Car.Type() != types.Number {
@@ -56,7 +57,7 @@ func EltAssign(args *cons.Cons, val types.Object, env environment.Environment) (
 		return nil, errors.New("index out of bounds")
 	}
 
-	success := l.Assign(uint64(index), val)
+	success := seq.Assign(uint64(index), val)
 	if !success {
 		return nil, errors.New("index out of bounds")
 	}

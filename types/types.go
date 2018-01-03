@@ -22,6 +22,8 @@ const (
 	Function
 	// HashTable object type
 	HashTable
+	// Array object type
+	Array
 )
 
 // Object interface, every Lisp object must implement these methods

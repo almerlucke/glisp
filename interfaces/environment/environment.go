@@ -30,6 +30,8 @@ type Environment interface {
 
 	DefineSymbol(name string, reserved bool, value types.Object) *symbols.Symbol
 
+	Gensym() *symbols.Symbol
+
 	Context() map[string]interface{}
 
 	Eval(obj types.Object) (types.Object, error)

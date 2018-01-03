@@ -20,6 +20,9 @@ type Environment struct {
 	// Symbol table holds all defined symbols in the environment
 	symTable map[string]*symbols.Symbol
 
+	// gensymCounter is used to create a unique symbol
+	gensymCounter uint64
+
 	// Scopes can be nested
 	scopes *list.List
 
@@ -64,6 +67,8 @@ func New() *Environment {
 	env.AddGlobalBinding(env.DefineSymbol("CAR", true, nil), buildin.CreateBuildinCar())
 	env.AddGlobalBinding(env.DefineSymbol("CONS", true, nil), buildin.CreateBuildinCons())
 	env.AddGlobalBinding(env.DefineSymbol("LAMBDA", true, nil), buildin.CreateBuildinLambda())
+	env.AddGlobalBinding(env.DefineSymbol("MACRO", true, nil), buildin.CreateBuildinMacro())
+	env.AddGlobalBinding(env.DefineSymbol("GENSYM", true, nil), buildin.CreateBuildinGensym())
 	env.AddGlobalBinding(env.DefineSymbol("PRINT", true, nil), buildin.CreateBuildinPrint())
 	env.AddGlobalBinding(env.DefineSymbol("EXIT", true, nil), buildin.CreateBuildinExit())
 	env.AddGlobalBinding(env.DefineSymbol("LOAD", true, nil), buildin.CreateBuildinLoad())
@@ -72,9 +77,21 @@ func New() *Environment {
 	env.AddGlobalBinding(env.DefineSymbol("SCOPE", true, nil), buildin.CreateBuildinScope())
 	env.AddGlobalBinding(env.DefineSymbol("EVAL", true, nil), buildin.CreateBuildinEval())
 	env.AddGlobalBinding(env.DefineSymbol("ELT", true, nil), buildin.CreateBuildinElt())
+	env.AddGlobalBinding(env.DefineSymbol("ARRAY", true, nil), buildin.CreateBuildinArray())
+	env.AddGlobalBinding(env.DefineSymbol("MAKE-ARRAY", true, nil), buildin.CreateBuildinMakeArray())
 	env.AddGlobalBinding(env.DefineSymbol("HASHTABLE", true, nil), buildin.CreateBuildinHashTable())
 
 	return env
+}
+
+// Gensym creates a unique uninterned symbol
+func (env *Environment) Gensym() *symbols.Symbol {
+	name := fmt.Sprintf("SYSTEM::G%d", env.gensymCounter)
+	env.gensymCounter++
+
+	return &symbols.Symbol{
+		Name: name,
+	}
 }
 
 // CurrentScope returns the current scope
@@ -229,13 +246,15 @@ func (env *Environment) Eval(obj types.Object) (types.Object, error) {
 		if c.Cdr != types.NIL {
 			args = c.Cdr.(*cons.Cons)
 			if fun.EvalArgs() {
-				args, err = args.Map(func(obj types.Object) (types.Object, error) {
+				seq, serr := args.Map(func(obj types.Object) (types.Object, error) {
 					return env.Eval(obj)
 				})
 
-				if err != nil {
-					return nil, err
+				if serr != nil {
+					return nil, serr
 				}
+
+				args = seq.(*cons.Cons)
 			}
 		}
 

@@ -58,9 +58,16 @@ func (fun *MacroFunction) expansion(args *cons.Cons, env environment.Environment
 	// Push local scope for bound input arguments
 	env.PushScope(nil)
 
+	// Push call
+	PushLambdaEvalCall(env)
+
 	defer func() {
+		// Pop scopes
 		env.PopScope()
 		env.PopScope()
+
+		// Pop call
+		PopLambdaEvalCall(env)
 
 		if r := recover(); r != nil {
 			// Return value

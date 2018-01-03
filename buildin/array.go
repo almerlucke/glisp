@@ -13,7 +13,7 @@ import (
 
 // Array buildin function creates an array with initial elements
 // or a specific size
-func Array(args *cons.Cons, env environment.Environment) (types.Object, error) {
+func Array(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	a := make(array.Array, args.Length())
 
 	_ = args.Iter(func(obj types.Object, index uint64) error {
@@ -25,7 +25,7 @@ func Array(args *cons.Cons, env environment.Environment) (types.Object, error) {
 }
 
 // MakeArray creates an array of a specific length with an optional initial element
-func MakeArray(args *cons.Cons, env environment.Environment) (types.Object, error) {
+func MakeArray(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	n := args.Car
 	var initialObject types.Object = types.NIL
 

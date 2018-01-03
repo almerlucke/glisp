@@ -8,7 +8,7 @@ import (
 )
 
 // Gensym buildin function
-func Gensym(args *cons.Cons, env environment.Environment) (types.Object, error) {
+func Gensym(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	return env.Gensym(), nil
 }
 

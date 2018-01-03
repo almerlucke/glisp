@@ -10,7 +10,7 @@ import (
 	"github.com/almerlucke/glisp/types/functions"
 )
 
-func expansion(obj types.Object, env environment.Environment) (types.Object, error) {
+func expansion(obj types.Object, env environment.Environment, context interface{}) (types.Object, error) {
 	if obj.Type() != types.Cons {
 		// If not a cons just return the object unevaluated
 		return obj, nil
@@ -28,7 +28,7 @@ func expansion(obj types.Object, env environment.Environment) (types.Object, err
 					return errors.New("unquote needs one argument")
 				}
 
-				result, err := env.Eval(l.Cdr.(*cons.Cons).Car)
+				result, err := env.Eval(l.Cdr.(*cons.Cons).Car, context)
 				if err != nil {
 					return err
 				}
@@ -40,7 +40,7 @@ func expansion(obj types.Object, env environment.Environment) (types.Object, err
 					return errors.New("splice needs one argument")
 				}
 
-				result, err := env.Eval(l.Cdr.(*cons.Cons).Car)
+				result, err := env.Eval(l.Cdr.(*cons.Cons).Car, context)
 				if err != nil {
 					return err
 				}
@@ -56,7 +56,7 @@ func expansion(obj types.Object, env environment.Environment) (types.Object, err
 					return errors.New("backquote needs one argument")
 				}
 
-				result, err := Backquote(l.Cdr.(*cons.Cons), env)
+				result, err := Backquote(l.Cdr.(*cons.Cons), env, context)
 				if err != nil {
 					return err
 				}
@@ -64,7 +64,7 @@ func expansion(obj types.Object, env environment.Environment) (types.Object, err
 				builder.PushBackObject(result)
 			} else {
 				// Expand list
-				result, err := expansion(l, env)
+				result, err := expansion(l, env, context)
 				if err != nil {
 					return err
 				}
@@ -87,7 +87,7 @@ func expansion(obj types.Object, env environment.Environment) (types.Object, err
 }
 
 // Backquote buildin function
-func Backquote(args *cons.Cons, env environment.Environment) (types.Object, error) {
+func Backquote(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	obj := args.Car
 
 	// If not a list, return object unevaluated
@@ -104,7 +104,7 @@ func Backquote(args *cons.Cons, env environment.Environment) (types.Object, erro
 			return nil, errors.New("unquote needs one argument")
 		}
 
-		return env.Eval(l.Cdr.(*cons.Cons).Car)
+		return env.Eval(l.Cdr.(*cons.Cons).Car, context)
 	} else if l.Car == symbols.SpliceSymbol {
 		// Splice arg outside list context is an error
 		return nil, errors.New("splice can only be evaluated in a list context")
@@ -114,10 +114,10 @@ func Backquote(args *cons.Cons, env environment.Environment) (types.Object, erro
 			return nil, errors.New("backquote needs one argument")
 		}
 
-		return Backquote(l.Cdr.(*cons.Cons), env)
+		return Backquote(l.Cdr.(*cons.Cons), env, context)
 	}
 
-	return expansion(l, env)
+	return expansion(l, env, context)
 }
 
 // CreateBuildinBackquote creates a buildin function object

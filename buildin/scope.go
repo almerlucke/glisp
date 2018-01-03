@@ -8,7 +8,7 @@ import (
 )
 
 // Scope buildin function
-func Scope(args *cons.Cons, env environment.Environment) (types.Object, error) {
+func Scope(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	// Push a new scope
 	env.PushScope(nil)
 
@@ -19,7 +19,7 @@ func Scope(args *cons.Cons, env environment.Environment) (types.Object, error) {
 	var err error
 
 	err = args.Iter(func(obj types.Object, index uint64) error {
-		val, err = env.Eval(obj)
+		val, err = env.Eval(obj, context)
 		return err
 	})
 

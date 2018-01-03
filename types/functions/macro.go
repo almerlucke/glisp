@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/almerlucke/glisp/interfaces/environment"
+	"github.com/almerlucke/glisp/interfaces/function"
 	"github.com/almerlucke/glisp/types"
 	"github.com/almerlucke/glisp/types/cons"
 	"github.com/almerlucke/glisp/types/symbols"
@@ -49,23 +50,34 @@ func (fun *MacroFunction) String() string {
 	return fmt.Sprintf("macro(%p)", fun)
 }
 
-// Eval lambda function evaluation
-func (fun *MacroFunction) Eval(args *cons.Cons, env environment.Environment) (types.Object, error) {
-	restore := func() {
-		env.PopScope()
-		env.PopScope()
-	}
-
+// Macro expansion
+func (fun *MacroFunction) expansion(args *cons.Cons, env environment.Environment, context interface{}) (result types.Object, err error) {
 	// First push captured scope
 	env.PushScope(fun.capturedScope)
 
 	// Push local scope for bound input arguments
 	env.PushScope(nil)
 
+	defer func() {
+		env.PopScope()
+		env.PopScope()
+
+		if r := recover(); r != nil {
+			// Return value
+			returnContext, ok := r.(*function.ReturnContext)
+			if ok {
+				// Return the evaluation of the macro expansion
+				result = returnContext.Object
+			} else {
+				// Continue to panic
+				panic(r)
+			}
+		}
+	}()
+
 	// Bind arguments
 	for _, sym := range fun.argList {
 		if sym.Reserved {
-			restore()
 			return nil, fmt.Errorf("can't bind to reserved symbol %v", sym)
 		}
 
@@ -85,25 +97,28 @@ func (fun *MacroFunction) Eval(args *cons.Cons, env environment.Environment) (ty
 		env.AddBinding(globals.AndRestSymbol, types.NIL)
 	}
 
-	// Evaluate body
-	var result types.Object = types.NIL
-	var err error
-
+	// Expand macro body
 	if fun.body != nil {
 		err = fun.body.Iter(func(obj types.Object, index uint64) error {
-			result, err = env.Eval(obj)
+			result, err = env.Eval(obj, context)
 			return err
 		})
 
 		if err != nil {
-			restore()
 			return nil, err
 		}
 	}
 
-	// Restore environment scope
-	restore()
+	return result, nil
+}
+
+// Eval lambda function evaluation
+func (fun *MacroFunction) Eval(args *cons.Cons, env environment.Environment, context interface{}) (result types.Object, err error) {
+	result, err = fun.expansion(args, env, context)
+	if err != nil {
+		return nil, err
+	}
 
 	// Return the evaluation of the macro expansion
-	return env.Eval(result)
+	return env.Eval(result, context)
 }

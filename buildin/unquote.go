@@ -8,7 +8,7 @@ import (
 )
 
 // Unquote buildin function
-func Unquote(args *cons.Cons, env environment.Environment) (types.Object, error) {
+func Unquote(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	return args.Car, nil
 }
 

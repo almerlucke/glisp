@@ -9,7 +9,7 @@ import (
 )
 
 // BuildinFunctionImp build in function implementation
-type BuildinFunctionImp func(*cons.Cons, environment.Environment) (types.Object, error)
+type BuildinFunctionImp func(*cons.Cons, environment.Environment, interface{}) (types.Object, error)
 
 // BuildinFunction object
 type BuildinFunction struct {
@@ -43,8 +43,8 @@ func (fun *BuildinFunction) Type() types.Type {
 }
 
 // Eval evaluates a function
-func (fun *BuildinFunction) Eval(args *cons.Cons, env environment.Environment) (types.Object, error) {
-	return fun.imp(args, env)
+func (fun *BuildinFunction) Eval(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
+	return fun.imp(args, env, context)
 }
 
 // String for Stringer

@@ -10,7 +10,7 @@ import (
 )
 
 // Exit buildin function
-func Exit(args *cons.Cons, env environment.Environment) (types.Object, error) {
+func Exit(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	// Exit program
 	os.Exit(0)
 

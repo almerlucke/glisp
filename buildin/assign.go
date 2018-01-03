@@ -12,12 +12,12 @@ import (
 	"github.com/almerlucke/glisp/types/symbols"
 )
 
-func symbolAssign(sym *symbols.Symbol, val types.Object, env environment.Environment) (types.Object, error) {
+func symbolAssign(sym *symbols.Symbol, val types.Object, env environment.Environment, context interface{}) (types.Object, error) {
 	if sym.Reserved {
 		return nil, fmt.Errorf("can't assign to a reserved symbol %v", sym)
 	}
 
-	val, err := env.Eval(val)
+	val, err := env.Eval(val, context)
 	if err != nil {
 		return nil, err
 	}
@@ -30,8 +30,8 @@ func symbolAssign(sym *symbols.Symbol, val types.Object, env environment.Environ
 	return val, nil
 }
 
-func expressionAssign(c *cons.Cons, val types.Object, env environment.Environment) (types.Object, error) {
-	r, err := env.Eval(c.Car)
+func expressionAssign(c *cons.Cons, val types.Object, env environment.Environment, context interface{}) (types.Object, error) {
+	r, err := env.Eval(c.Car, context)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +62,7 @@ func expressionAssign(c *cons.Cons, val types.Object, env environment.Environmen
 		args = c.Cdr.(*cons.Cons)
 		if assignable.EvalArgs() {
 			seq, serr := args.Map(func(obj types.Object) (types.Object, error) {
-				return env.Eval(obj)
+				return env.Eval(obj, context)
 			})
 
 			if serr != nil {
@@ -75,22 +75,22 @@ func expressionAssign(c *cons.Cons, val types.Object, env environment.Environmen
 
 	// Evaluate assign value if needed
 	if assignable.EvalArgs() {
-		val, err = env.Eval(val)
+		val, err = env.Eval(val, context)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	return assignable.Assign(args, val, env)
+	return assignable.Assign(args, val, env, context)
 }
 
 // Assign buildin function
-func Assign(args *cons.Cons, env environment.Environment) (types.Object, error) {
+func Assign(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	switch args.Car.Type() {
 	case types.Symbol:
-		return symbolAssign(args.Car.(*symbols.Symbol), args.Cdr.(*cons.Cons).Car, env)
+		return symbolAssign(args.Car.(*symbols.Symbol), args.Cdr.(*cons.Cons).Car, env, context)
 	case types.Cons:
-		return expressionAssign(args.Car.(*cons.Cons), args.Cdr.(*cons.Cons).Car, env)
+		return expressionAssign(args.Car.(*cons.Cons), args.Cdr.(*cons.Cons).Car, env, context)
 	}
 
 	return nil, fmt.Errorf("can't assign to %v", args.Car)

@@ -12,7 +12,7 @@ import (
 )
 
 // Elt buildin function
-func Elt(args *cons.Cons, env environment.Environment) (types.Object, error) {
+func Elt(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	seq, ok := args.Car.(sequence.Sequence)
 
 	if !ok {
@@ -39,7 +39,7 @@ func Elt(args *cons.Cons, env environment.Environment) (types.Object, error) {
 }
 
 // EltAssign assignable version of Elt
-func EltAssign(args *cons.Cons, val types.Object, env environment.Environment) (types.Object, error) {
+func EltAssign(args *cons.Cons, val types.Object, env environment.Environment, context interface{}) (types.Object, error) {
 	seq, ok := args.Car.(sequence.Sequence)
 
 	if !ok {

@@ -8,8 +8,8 @@ import (
 )
 
 // Eval buildin function
-func Eval(args *cons.Cons, env environment.Environment) (types.Object, error) {
-	return env.Eval(args.Car)
+func Eval(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
+	return env.Eval(args.Car, context)
 }
 
 // CreateBuildinEval creates a buildin function object

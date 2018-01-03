@@ -8,7 +8,7 @@ import (
 )
 
 // Cons buildin function
-func Cons(args *cons.Cons, env environment.Environment) (types.Object, error) {
+func Cons(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	obj1 := args.Car
 	obj2 := args.Cdr.(*cons.Cons).Car
 

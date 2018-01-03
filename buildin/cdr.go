@@ -10,7 +10,7 @@ import (
 )
 
 // Cdr buildin function
-func Cdr(args *cons.Cons, env environment.Environment) (types.Object, error) {
+func Cdr(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	obj := args.Car
 
 	if obj == types.NIL {

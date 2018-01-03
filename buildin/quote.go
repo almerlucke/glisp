@@ -8,7 +8,7 @@ import (
 )
 
 // Quote buildin function
-func Quote(args *cons.Cons, env environment.Environment) (types.Object, error) {
+func Quote(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	return args.Car, nil
 }
 

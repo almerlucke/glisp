@@ -71,6 +71,7 @@ func New() *Environment {
 	env.AddGlobalBinding(env.DefineSymbol("GENSYM", true, nil), buildin.CreateBuildinGensym())
 	env.AddGlobalBinding(env.DefineSymbol("PRINT", true, nil), buildin.CreateBuildinPrint())
 	env.AddGlobalBinding(env.DefineSymbol("EXIT", true, nil), buildin.CreateBuildinExit())
+	env.AddGlobalBinding(env.DefineSymbol("RETURN", true, nil), buildin.CreateBuildinReturn())
 	env.AddGlobalBinding(env.DefineSymbol("LOAD", true, nil), buildin.CreateBuildinLoad())
 	env.AddGlobalBinding(env.DefineSymbol("VAR", true, nil), buildin.CreateBuildinVar())
 	env.AddGlobalBinding(env.DefineSymbol("=", true, nil), buildin.CreateBuildinAssign())
@@ -79,6 +80,8 @@ func New() *Environment {
 	env.AddGlobalBinding(env.DefineSymbol("ELT", true, nil), buildin.CreateBuildinElt())
 	env.AddGlobalBinding(env.DefineSymbol("ARRAY", true, nil), buildin.CreateBuildinArray())
 	env.AddGlobalBinding(env.DefineSymbol("MAKE-ARRAY", true, nil), buildin.CreateBuildinMakeArray())
+	env.AddGlobalBinding(env.DefineSymbol("IF", true, nil), buildin.CreateBuildinIf())
+	env.AddGlobalBinding(env.DefineSymbol("PROGN", true, nil), buildin.CreateBuildinProgn())
 	env.AddGlobalBinding(env.DefineSymbol("HASHTABLE", true, nil), buildin.CreateBuildinHashTable())
 
 	return env
@@ -202,7 +205,7 @@ func (env *Environment) Context() map[string]interface{} {
 }
 
 // Eval evaluates an object with this environment
-func (env *Environment) Eval(obj types.Object) (types.Object, error) {
+func (env *Environment) Eval(obj types.Object, context interface{}) (types.Object, error) {
 	result := obj
 
 	switch obj.Type() {
@@ -218,7 +221,7 @@ func (env *Environment) Eval(obj types.Object) (types.Object, error) {
 		c := obj.(*cons.Cons)
 
 		// Evaluate first elem
-		r, err := env.Eval(c.Car)
+		r, err := env.Eval(c.Car, context)
 		if err != nil {
 			return nil, err
 		}
@@ -247,7 +250,7 @@ func (env *Environment) Eval(obj types.Object) (types.Object, error) {
 			args = c.Cdr.(*cons.Cons)
 			if fun.EvalArgs() {
 				seq, serr := args.Map(func(obj types.Object) (types.Object, error) {
-					return env.Eval(obj)
+					return env.Eval(obj, context)
 				})
 
 				if serr != nil {
@@ -259,7 +262,7 @@ func (env *Environment) Eval(obj types.Object) (types.Object, error) {
 		}
 
 		// Evaluate function call
-		result, err = fun.Eval(args, env)
+		result, err = fun.Eval(args, env, context)
 		if err != nil {
 			return nil, err
 		}

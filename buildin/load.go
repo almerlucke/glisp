@@ -17,7 +17,7 @@ import (
 )
 
 // Load buildin function
-func Load(args *cons.Cons, env environment.Environment) (types.Object, error) {
+func Load(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	if args.Car.Type() != types.String {
 		return nil, errors.New("load expected a path string as first argument")
 	}
@@ -40,7 +40,7 @@ func Load(args *cons.Cons, env environment.Environment) (types.Object, error) {
 	var result types.Object
 
 	for err == nil {
-		result, err = env.Eval(obj)
+		result, err = env.Eval(obj, context)
 		if err != nil {
 			return nil, rd.ErrorWithError(err)
 		}

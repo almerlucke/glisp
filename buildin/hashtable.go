@@ -11,7 +11,7 @@ import (
 )
 
 // HashTable buildin function
-func HashTable(args *cons.Cons, env environment.Environment) (types.Object, error) {
+func HashTable(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	hash := make(hashtables.HashTable)
 
 	err := args.Iter(func(obj types.Object, index uint64) error {

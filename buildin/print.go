@@ -10,7 +10,7 @@ import (
 )
 
 // Print buildin function
-func Print(args *cons.Cons, env environment.Environment) (types.Object, error) {
+func Print(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	if args != nil {
 		args.Iter(func(obj types.Object, index uint64) error {
 			fmt.Printf("%v\n", obj)

@@ -27,7 +27,7 @@ func main() {
 	var result types.Object
 
 	for err == nil {
-		result, err = env.Eval(obj)
+		result, err = env.Eval(obj, nil)
 		if err != nil {
 			log.Fatalf("eval error %v\n", rd.ErrorWithError(err))
 		}

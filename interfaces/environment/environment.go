@@ -34,5 +34,5 @@ type Environment interface {
 
 	Context() map[string]interface{}
 
-	Eval(obj types.Object) (types.Object, error)
+	Eval(obj types.Object, context interface{}) (types.Object, error)
 }

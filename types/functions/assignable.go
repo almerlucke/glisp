@@ -7,7 +7,7 @@ import (
 )
 
 // AssignableFunctionImp assign function implementation
-type AssignableFunctionImp func(*cons.Cons, types.Object, environment.Environment) (types.Object, error)
+type AssignableFunctionImp func(*cons.Cons, types.Object, environment.Environment, interface{}) (types.Object, error)
 
 // AssignableFunction function that implements Assignable
 type AssignableFunction struct {
@@ -24,6 +24,6 @@ func NewAssignableFunction(imp BuildinFunctionImp, assignImp AssignableFunctionI
 }
 
 // Assign call
-func (fun *AssignableFunction) Assign(args *cons.Cons, val types.Object, env environment.Environment) (types.Object, error) {
-	return fun.assignImp(args, val, env)
+func (fun *AssignableFunction) Assign(args *cons.Cons, val types.Object, env environment.Environment, context interface{}) (types.Object, error) {
+	return fun.assignImp(args, val, env, context)
 }

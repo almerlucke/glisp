@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/almerlucke/glisp/interfaces/environment"
+	"github.com/almerlucke/glisp/interfaces/function"
 	"github.com/almerlucke/glisp/types"
 	"github.com/almerlucke/glisp/types/cons"
 	"github.com/almerlucke/glisp/types/symbols"
@@ -48,7 +49,7 @@ func (fun *LambdaFunction) String() string {
 }
 
 // Eval lambda function evaluation
-func (fun *LambdaFunction) Eval(args *cons.Cons, env environment.Environment) (types.Object, error) {
+func (fun *LambdaFunction) Eval(args *cons.Cons, env environment.Environment, context interface{}) (result types.Object, err error) {
 	// First push captured scope
 	env.PushScope(fun.capturedScope)
 
@@ -59,6 +60,17 @@ func (fun *LambdaFunction) Eval(args *cons.Cons, env environment.Environment) (t
 	defer func() {
 		env.PopScope()
 		env.PopScope()
+
+		if r := recover(); r != nil {
+			// Return value
+			returnContext, ok := r.(*function.ReturnContext)
+			if ok {
+				result = returnContext.Object
+			} else {
+				// Continue to panic
+				panic(r)
+			}
+		}
 	}()
 
 	// Bind arguments
@@ -83,13 +95,9 @@ func (fun *LambdaFunction) Eval(args *cons.Cons, env environment.Environment) (t
 		env.AddBinding(globals.AndRestSymbol, types.NIL)
 	}
 
-	// Evaluate body
-	var result types.Object = types.NIL
-	var err error
-
 	if fun.body != nil {
 		err = fun.body.Iter(func(obj types.Object, index uint64) error {
-			result, err = env.Eval(obj)
+			result, err = env.Eval(obj, context)
 			return err
 		})
 

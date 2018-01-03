@@ -12,7 +12,7 @@ import (
 )
 
 // Var buildin function
-func Var(args *cons.Cons, env environment.Environment) (types.Object, error) {
+func Var(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	if args.Car.Type() != types.Symbol {
 		return nil, errors.New("var expected a symbol as first argument")
 	}
@@ -28,7 +28,7 @@ func Var(args *cons.Cons, env environment.Environment) (types.Object, error) {
 
 	if args.Cdr.Type() == types.Cons {
 		args = args.Cdr.(*cons.Cons)
-		val, err = env.Eval(args.Car)
+		val, err = env.Eval(args.Car, context)
 		if err != nil {
 			return nil, err
 		}

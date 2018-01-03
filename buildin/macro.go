@@ -12,7 +12,7 @@ import (
 )
 
 // Macro buildin function
-func Macro(args *cons.Cons, env environment.Environment) (types.Object, error) {
+func Macro(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	argType := args.Car.Type()
 
 	// Arg list must be cons or nil

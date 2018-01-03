@@ -10,7 +10,7 @@ import (
 )
 
 // Car buildin function
-func Car(args *cons.Cons, env environment.Environment) (types.Object, error) {
+func Car(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	obj := args.Car
 
 	if obj == types.NIL {

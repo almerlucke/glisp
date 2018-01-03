@@ -12,7 +12,7 @@ import (
 )
 
 // Lambda buildin function
-func Lambda(args *cons.Cons, env environment.Environment) (types.Object, error) {
+func Lambda(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	argType := args.Car.Type()
 
 	// Arg list must be cons or nil

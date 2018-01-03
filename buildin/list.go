@@ -8,7 +8,7 @@ import (
 )
 
 // List buildin function
-func List(args *cons.Cons, env environment.Environment) (types.Object, error) {
+func List(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	if args == nil {
 		return types.NIL, nil
 	}

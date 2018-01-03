@@ -4,16 +4,18 @@ import (
 	"errors"
 	"io"
 
-	"github.com/almerlucke/glisp/environment"
-	"github.com/almerlucke/glisp/reader"
+	globals "github.com/almerlucke/glisp/globals/symbols"
+
+	"github.com/almerlucke/glisp/interfaces/reader"
 	"github.com/almerlucke/glisp/types"
 	"github.com/almerlucke/glisp/types/cons"
 	"github.com/almerlucke/glisp/types/symbols"
 )
 
 // UnquoteMacro used for , and ,@ forms in a backquote form
-func UnquoteMacro(rd *reader.Reader) (types.Object, error) {
-	if rd.BackquoteDepth == 0 {
+func UnquoteMacro(rd reader.Reader) (types.Object, error) {
+	ctx, ok := rd.Context()["backquoteContext"]
+	if !ok || ctx.(*BackquoteContext).Depth == 0 {
 		return nil, errors.New("unquote and splice can only be used in a backquote form")
 	}
 
@@ -61,9 +63,9 @@ func UnquoteMacro(rd *reader.Reader) (types.Object, error) {
 
 	var sym *symbols.Symbol
 	if splice {
-		sym = environment.SpliceSymbol
+		sym = globals.SpliceSymbol
 	} else {
-		sym = environment.UnquoteSymbol
+		sym = globals.UnquoteSymbol
 	}
 
 	return &cons.Cons{

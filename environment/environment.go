@@ -2,10 +2,16 @@ package environment
 
 import (
 	"container/list"
+	"errors"
 	"fmt"
 
-	"github.com/almerlucke/glisp/scope"
+	globals "github.com/almerlucke/glisp/globals/symbols"
+
+	"github.com/almerlucke/glisp/interfaces/environment"
 	"github.com/almerlucke/glisp/types"
+	"github.com/almerlucke/glisp/types/cons"
+	"github.com/almerlucke/glisp/types/functions/buildin"
+	"github.com/almerlucke/glisp/types/functions/function"
 	"github.com/almerlucke/glisp/types/symbols"
 )
 
@@ -19,52 +25,72 @@ type Environment struct {
 
 	// Global scope is always at the end of the list, but also keep
 	// a reference here for ease
-	globalScope scope.Scope
+	globalScope environment.Scope
 
 	// Context can hold all kinds of values
 	context map[string]interface{}
 }
 
-// New returns a new environment
+// New returns a new default environment
 func New() *Environment {
-	globalScope := make(scope.Scope)
+	globalScope := make(environment.Scope)
 	scopes := list.New()
 	scopes.PushFront(globalScope)
 
 	env := &Environment{
 		globalScope: globalScope,
 		symTable: map[string]*symbols.Symbol{
-			NILSymbol.Name:              NILSymbol,
-			TSymbol.Name:                TSymbol,
-			DotSymbol.Name:              DotSymbol,
-			CloseParenthesisSymbol.Name: CloseParenthesisSymbol,
-			QuoteSymbol.Name:            QuoteSymbol,
-			BackquoteSymbol.Name:        BackquoteSymbol,
-			UnquoteSymbol.Name:          UnquoteSymbol,
-			SpliceSymbol.Name:           SpliceSymbol,
-			AndRestSymbol.Name:          AndRestSymbol,
+			globals.NILSymbol.Name:              globals.NILSymbol,
+			globals.TSymbol.Name:                globals.TSymbol,
+			globals.DotSymbol.Name:              globals.DotSymbol,
+			globals.CloseParenthesisSymbol.Name: globals.CloseParenthesisSymbol,
+			globals.QuoteSymbol.Name:            globals.QuoteSymbol,
+			globals.BackquoteSymbol.Name:        globals.BackquoteSymbol,
+			globals.UnquoteSymbol.Name:          globals.UnquoteSymbol,
+			globals.SpliceSymbol.Name:           globals.SpliceSymbol,
+			globals.AndRestSymbol.Name:          globals.AndRestSymbol,
 		},
 		scopes:  scopes,
 		context: map[string]interface{}{},
 	}
 
+	env.AddGlobalBinding(globals.QuoteSymbol, buildin.CreateBuildinQuote())
+	env.AddGlobalBinding(globals.BackquoteSymbol, buildin.CreateBuildinBackquote())
+	env.AddGlobalBinding(globals.UnquoteSymbol, buildin.CreateBuildinUnquote())
+	env.AddGlobalBinding(globals.SpliceSymbol, buildin.CreateBuildinUnquote())
+
+	env.AddGlobalBinding(env.DefineSymbol("LIST", true, nil), buildin.CreateBuildinList())
+	env.AddGlobalBinding(env.DefineSymbol("CDR", true, nil), buildin.CreateBuildinCdr())
+	env.AddGlobalBinding(env.DefineSymbol("CAR", true, nil), buildin.CreateBuildinCar())
+	env.AddGlobalBinding(env.DefineSymbol("CONS", true, nil), buildin.CreateBuildinCons())
+	env.AddGlobalBinding(env.DefineSymbol("LAMBDA", true, nil), buildin.CreateBuildinLambda())
+	env.AddGlobalBinding(env.DefineSymbol("PRINT", true, nil), buildin.CreateBuildinPrint())
+	env.AddGlobalBinding(env.DefineSymbol("EXIT", true, nil), buildin.CreateBuildinExit())
+	env.AddGlobalBinding(env.DefineSymbol("LOAD", true, nil), buildin.CreateBuildinLoad())
+	env.AddGlobalBinding(env.DefineSymbol("VAR", true, nil), buildin.CreateBuildinVar())
+	env.AddGlobalBinding(env.DefineSymbol("=", true, nil), buildin.CreateBuildinAssign())
+	env.AddGlobalBinding(env.DefineSymbol("SCOPE", true, nil), buildin.CreateBuildinScope())
+	env.AddGlobalBinding(env.DefineSymbol("EVAL", true, nil), buildin.CreateBuildinEval())
+	env.AddGlobalBinding(env.DefineSymbol("ELT", true, nil), buildin.CreateBuildinElt())
+	env.AddGlobalBinding(env.DefineSymbol("HASHTABLE", true, nil), buildin.CreateBuildinHashTable())
+
 	return env
 }
 
 // CurrentScope returns the current scope
-func (env *Environment) CurrentScope() scope.Scope {
-	return env.scopes.Front().Value.(scope.Scope)
+func (env *Environment) CurrentScope() environment.Scope {
+	return env.scopes.Front().Value.(environment.Scope)
 }
 
 // PopScope pop a scope
-func (env *Environment) PopScope() scope.Scope {
-	return env.scopes.Remove(env.scopes.Front()).(scope.Scope)
+func (env *Environment) PopScope() environment.Scope {
+	return env.scopes.Remove(env.scopes.Front()).(environment.Scope)
 }
 
 // PushScope push a scope, if scope is nil create a new one
-func (env *Environment) PushScope(s scope.Scope) scope.Scope {
+func (env *Environment) PushScope(s environment.Scope) environment.Scope {
 	if s == nil {
-		s = make(scope.Scope)
+		s = make(environment.Scope)
 	}
 
 	env.scopes.PushFront(s)
@@ -74,11 +100,11 @@ func (env *Environment) PushScope(s scope.Scope) scope.Scope {
 
 // CaptureScope captures the scope stack flattened except for the global scope
 // if a symbol is shadowed, only capture the topmost binding
-func (env *Environment) CaptureScope() scope.Scope {
-	s := make(scope.Scope)
+func (env *Environment) CaptureScope() environment.Scope {
+	s := make(environment.Scope)
 
 	for e := env.scopes.Front(); e.Next() != nil; e = e.Next() {
-		otherScope := e.Value.(scope.Scope)
+		otherScope := e.Value.(environment.Scope)
 		for sym, val := range otherScope {
 			if s[sym] == nil {
 				s[sym] = val
@@ -96,7 +122,7 @@ func (env *Environment) AddGlobalBinding(sym *symbols.Symbol, obj types.Object) 
 
 // AddBinding bind object to symbol in the current scope
 func (env *Environment) AddBinding(sym *symbols.Symbol, obj types.Object) {
-	env.scopes.Front().Value.(scope.Scope)[sym] = obj
+	env.scopes.Front().Value.(environment.Scope)[sym] = obj
 }
 
 // GetBinding get binding for symbol
@@ -105,7 +131,7 @@ func (env *Environment) GetBinding(sym *symbols.Symbol) types.Object {
 
 	// Go through scopes to find binding
 	for e := env.scopes.Front(); e != nil; e = e.Next() {
-		s := e.Value.(scope.Scope)
+		s := e.Value.(environment.Scope)
 		obj = s[sym]
 		if obj != nil {
 			break
@@ -119,7 +145,7 @@ func (env *Environment) GetBinding(sym *symbols.Symbol) types.Object {
 func (env *Environment) SetBinding(sym *symbols.Symbol, obj types.Object) error {
 	// Go through scopes to find binding
 	for e := env.scopes.Front(); e != nil; e = e.Next() {
-		s := e.Value.(scope.Scope)
+		s := e.Value.(environment.Scope)
 		_, ok := s[sym]
 		if ok {
 			s[sym] = obj
@@ -153,6 +179,72 @@ func (env *Environment) DefineSymbol(name string, reserved bool, value types.Obj
 	return sym
 }
 
+// Context returns the environment context
 func (env *Environment) Context() map[string]interface{} {
 	return env.context
+}
+
+// Eval evaluates an object with this environment
+func (env *Environment) Eval(obj types.Object) (types.Object, error) {
+	result := obj
+
+	switch obj.Type() {
+
+	case types.Symbol:
+		result = env.GetBinding(obj.(*symbols.Symbol))
+		if result == nil {
+			return nil, fmt.Errorf("unbound symbol %v", obj)
+		}
+
+	case types.Cons:
+		// List to evaluate
+		c := obj.(*cons.Cons)
+
+		// Evaluate first elem
+		r, err := env.Eval(c.Car)
+		if err != nil {
+			return nil, err
+		}
+
+		// Must be a function
+		if r.Type() != types.Function {
+			return nil, fmt.Errorf("eval %v is not a function", r)
+		}
+
+		fun := r.(function.Function)
+
+		// Check for pure and get length
+		pure, length := c.Info()
+		if !pure {
+			return nil, errors.New("eval can't evaluate a dotted list")
+		}
+
+		// Check if we have enough arguments
+		if (length - 1) < int64(fun.NumArgs()) {
+			return nil, fmt.Errorf("not enough arguments to function %v", c.Car)
+		}
+
+		// If we need to first evaluate all args
+		var args *cons.Cons
+		if c.Cdr != types.NIL {
+			args = c.Cdr.(*cons.Cons)
+			if fun.EvalArgs() {
+				args, err = args.Map(func(obj types.Object) (types.Object, error) {
+					return env.Eval(obj)
+				})
+
+				if err != nil {
+					return nil, err
+				}
+			}
+		}
+
+		// Evaluate function call
+		result, err = fun.Eval(args, env)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return result, nil
 }

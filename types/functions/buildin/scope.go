@@ -1,7 +1,6 @@
 package buildin
 
 import (
-	"github.com/almerlucke/glisp/evaluator"
 	"github.com/almerlucke/glisp/interfaces/environment"
 	"github.com/almerlucke/glisp/types"
 	"github.com/almerlucke/glisp/types/cons"
@@ -20,7 +19,7 @@ func Scope(args *cons.Cons, env environment.Environment) (types.Object, error) {
 	var err error
 
 	err = args.Iter(func(obj types.Object, index uint64) error {
-		val, err = evaluator.Eval(obj, env)
+		val, err = env.Eval(obj)
 		return err
 	})
 

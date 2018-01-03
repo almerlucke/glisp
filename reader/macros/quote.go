@@ -4,14 +4,14 @@ import (
 	"errors"
 	"io"
 
-	"github.com/almerlucke/glisp/environment"
-	"github.com/almerlucke/glisp/reader"
+	"github.com/almerlucke/glisp/globals/symbols"
+	"github.com/almerlucke/glisp/interfaces/reader"
 	"github.com/almerlucke/glisp/types"
 	"github.com/almerlucke/glisp/types/cons"
 )
 
 // QuoteMacro quote an object
-func QuoteMacro(rd *reader.Reader) (types.Object, error) {
+func QuoteMacro(rd reader.Reader) (types.Object, error) {
 	var obj types.Object
 	var err error
 
@@ -30,7 +30,7 @@ func QuoteMacro(rd *reader.Reader) (types.Object, error) {
 	}
 
 	return &cons.Cons{
-		Car: environment.QuoteSymbol,
+		Car: symbols.QuoteSymbol,
 		Cdr: &cons.Cons{
 			Car: obj,
 			Cdr: types.NIL,

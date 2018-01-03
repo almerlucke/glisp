@@ -4,7 +4,7 @@ import (
 	"errors"
 	"io"
 
-	"github.com/almerlucke/glisp/reader"
+	"github.com/almerlucke/glisp/interfaces/reader"
 	"github.com/almerlucke/glisp/types"
 )
 
@@ -17,7 +17,7 @@ func commentErr(err error) error {
 }
 
 // CommentDispatch multi line comment dispatch macro
-func CommentDispatch(arg uint64, rd *reader.Reader) (types.Object, error) {
+func CommentDispatch(arg uint64, rd reader.Reader) (types.Object, error) {
 	nestedLevel := 1
 
 	for {

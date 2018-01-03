@@ -4,22 +4,35 @@ import (
 	"errors"
 	"io"
 
-	"github.com/almerlucke/glisp/environment"
-	"github.com/almerlucke/glisp/reader"
+	"github.com/almerlucke/glisp/globals/symbols"
+	"github.com/almerlucke/glisp/interfaces/reader"
 	"github.com/almerlucke/glisp/types"
 	"github.com/almerlucke/glisp/types/cons"
 )
 
+type listContext struct {
+	Depth int
+}
+
 // OpenParenthesisMacro is called when an open parenthesis is encountered
-func OpenParenthesisMacro(reader *reader.Reader) (types.Object, error) {
+func OpenParenthesisMacro(rd reader.Reader) (types.Object, error) {
 	dotFound := false
 	dottedObjCnt := 0
 	builder := cons.ListBuilder{}
 
-	reader.Depth++
+	var lctx *listContext
+	ctx, ok := rd.Context()["listContext"]
+	if !ok {
+		lctx = &listContext{}
+		rd.Context()["listContext"] = lctx
+	} else {
+		lctx = ctx.(*listContext)
+	}
+
+	lctx.Depth++
 
 	for {
-		obj, err := reader.ReadObject()
+		obj, err := rd.ReadObject()
 		if err != nil {
 			if err == io.EOF {
 				return nil, errors.New("unmatched parenthesis")
@@ -28,7 +41,7 @@ func OpenParenthesisMacro(reader *reader.Reader) (types.Object, error) {
 			return nil, err
 		}
 
-		if obj == environment.CloseParenthesisSymbol {
+		if obj == symbols.CloseParenthesisSymbol {
 			if dotFound && dottedObjCnt != 1 {
 				return nil, errors.New("expected one object after dot")
 			}
@@ -36,7 +49,7 @@ func OpenParenthesisMacro(reader *reader.Reader) (types.Object, error) {
 			break
 		}
 
-		if obj == environment.DotSymbol {
+		if obj == symbols.DotSymbol {
 			dotFound = true
 		} else if obj != nil {
 			if dotFound {
@@ -54,7 +67,7 @@ func OpenParenthesisMacro(reader *reader.Reader) (types.Object, error) {
 		}
 	}
 
-	reader.Depth--
+	lctx.Depth--
 
 	if builder.Head == nil {
 		return types.NIL, nil
@@ -64,10 +77,11 @@ func OpenParenthesisMacro(reader *reader.Reader) (types.Object, error) {
 }
 
 // CloseParenthesisMacro is called when a closing parenthesis is encountered
-func CloseParenthesisMacro(reader *reader.Reader) (types.Object, error) {
-	if reader.Depth == 0 {
+func CloseParenthesisMacro(rd reader.Reader) (types.Object, error) {
+	ctx, ok := rd.Context()["listContext"]
+	if !ok || ctx.(*listContext).Depth == 0 {
 		return nil, errors.New("unmatched parenthesis")
 	}
 
-	return environment.CloseParenthesisSymbol, nil
+	return symbols.CloseParenthesisSymbol, nil
 }

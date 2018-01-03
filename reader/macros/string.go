@@ -8,7 +8,8 @@ import (
 	"strconv"
 	"unicode"
 
-	"github.com/almerlucke/glisp/reader"
+	"github.com/almerlucke/glisp/interfaces/reader"
+	"github.com/almerlucke/glisp/reader/utils"
 	"github.com/almerlucke/glisp/types"
 	"github.com/almerlucke/glisp/types/strings"
 )
@@ -35,7 +36,7 @@ func isHexadecimal(r rune) bool {
 	return unicode.Is(unicode.ASCII_Hex_Digit, r)
 }
 
-func octalEscape(startDigit rune, rd *reader.Reader) (rune, error) {
+func octalEscape(startDigit rune, rd reader.Reader) (rune, error) {
 	rs, err := rd.NextRunes(2, func(r rune) (bool, error) {
 		return !isOctal(r), nil
 	})
@@ -48,7 +49,7 @@ func octalEscape(startDigit rune, rd *reader.Reader) (rune, error) {
 	return rune(o), err
 }
 
-func hexadecimalEscape(rd *reader.Reader) (rune, error) {
+func hexadecimalEscape(rd reader.Reader) (rune, error) {
 	rs, err := rd.NextRunes(math.MaxInt32, func(r rune) (bool, error) {
 		return !isHexadecimal(r), nil
 	})
@@ -61,7 +62,7 @@ func hexadecimalEscape(rd *reader.Reader) (rune, error) {
 	return rune(hex), err
 }
 
-func unicodeEscape(n int, escapeChar rune, rd *reader.Reader) ([]rune, error) {
+func unicodeEscape(n int, escapeChar rune, rd reader.Reader) ([]rune, error) {
 	rs, err := rd.NextRunes(n, func(r rune) (bool, error) {
 		return !isHexadecimal(r), nil
 	})
@@ -84,7 +85,7 @@ func unicodeEscape(n int, escapeChar rune, rd *reader.Reader) ([]rune, error) {
 	return []rune(str), err
 }
 
-func escapeSequence(rd *reader.Reader) ([]rune, error) {
+func escapeSequence(rd reader.Reader) ([]rune, error) {
 	c, _, err := rd.ReadChar()
 	if err != nil {
 		return nil, err
@@ -128,7 +129,7 @@ func escapeSequence(rd *reader.Reader) ([]rune, error) {
 }
 
 // StringMacro macro for parsing a string object from stream
-func StringMacro(rd *reader.Reader) (types.Object, error) {
+func StringMacro(rd reader.Reader) (types.Object, error) {
 	l := list.New()
 
 	for true {
@@ -139,7 +140,7 @@ func StringMacro(rd *reader.Reader) (types.Object, error) {
 
 		if c == '"' {
 			break
-		} else if c == reader.Newline {
+		} else if rd.IsNewline(c) {
 			return nil, errors.New("multiline string not allowed")
 		} else if c == '\\' {
 			s, err := escapeSequence(rd)
@@ -155,5 +156,5 @@ func StringMacro(rd *reader.Reader) (types.Object, error) {
 		}
 	}
 
-	return strings.String(reader.RuneListToSlice(l)), nil
+	return strings.String(utils.RuneListToSlice(l)), nil
 }

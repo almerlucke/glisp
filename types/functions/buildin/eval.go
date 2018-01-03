@@ -1,7 +1,6 @@
 package buildin
 
 import (
-	"github.com/almerlucke/glisp/evaluator"
 	"github.com/almerlucke/glisp/interfaces/environment"
 	"github.com/almerlucke/glisp/types"
 	"github.com/almerlucke/glisp/types/cons"
@@ -10,7 +9,7 @@ import (
 
 // Eval buildin function
 func Eval(args *cons.Cons, env environment.Environment) (types.Object, error) {
-	return evaluator.Eval(args.Car, env)
+	return env.Eval(args.Car)
 }
 
 // CreateBuildinEval creates a buildin function object

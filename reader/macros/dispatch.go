@@ -8,12 +8,12 @@ import (
 	"strconv"
 	"unicode"
 
-	"github.com/almerlucke/glisp/reader"
+	"github.com/almerlucke/glisp/interfaces/reader"
 	"github.com/almerlucke/glisp/types"
 )
 
 // DispatchMacro dispatches a macro based on the character after the sharpsign
-func DispatchMacro(rd *reader.Reader) (types.Object, error) {
+func DispatchMacro(rd reader.Reader) (types.Object, error) {
 	// Get optional digits
 	digits, err := rd.NextRunes(math.MaxInt32, func(c rune) (bool, error) {
 		return !unicode.IsDigit(c), nil

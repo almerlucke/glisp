@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/almerlucke/glisp/evaluator"
 	"github.com/almerlucke/glisp/interfaces/environment"
 	"github.com/almerlucke/glisp/types"
 	"github.com/almerlucke/glisp/types/cons"
@@ -18,7 +17,7 @@ func symbolAssign(sym *symbols.Symbol, val types.Object, env environment.Environ
 		return nil, fmt.Errorf("can't assign to a reserved symbol %v", sym)
 	}
 
-	val, err := evaluator.Eval(val, env)
+	val, err := env.Eval(val)
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +31,7 @@ func symbolAssign(sym *symbols.Symbol, val types.Object, env environment.Environ
 }
 
 func expressionAssign(c *cons.Cons, val types.Object, env environment.Environment) (types.Object, error) {
-	r, err := evaluator.Eval(c.Car, env)
+	r, err := env.Eval(c.Car)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +62,7 @@ func expressionAssign(c *cons.Cons, val types.Object, env environment.Environmen
 		args = c.Cdr.(*cons.Cons)
 		if assignable.EvalArgs() {
 			args, err = args.Map(func(obj types.Object) (types.Object, error) {
-				return evaluator.Eval(obj, env)
+				return env.Eval(obj)
 			})
 
 			if err != nil {
@@ -74,7 +73,7 @@ func expressionAssign(c *cons.Cons, val types.Object, env environment.Environmen
 
 	// Evaluate assign value if needed
 	if assignable.EvalArgs() {
-		val, err = evaluator.Eval(val, env)
+		val, err = env.Eval(val)
 		if err != nil {
 			return nil, err
 		}

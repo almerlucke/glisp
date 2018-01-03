@@ -3,10 +3,9 @@ package functions
 import (
 	"fmt"
 
-	defaultEnvironment "github.com/almerlucke/glisp/environment"
-	"github.com/almerlucke/glisp/evaluator"
+	globals "github.com/almerlucke/glisp/globals/symbols"
+
 	"github.com/almerlucke/glisp/interfaces/environment"
-	"github.com/almerlucke/glisp/scope"
 	"github.com/almerlucke/glisp/types"
 	"github.com/almerlucke/glisp/types/cons"
 	"github.com/almerlucke/glisp/types/symbols"
@@ -81,12 +80,12 @@ func (fun *AssignableFunction) Assign(args *cons.Cons, val types.Object, env env
 // LambdaFunction anonymous function
 type LambdaFunction struct {
 	argList       []*symbols.Symbol
-	capturedScope scope.Scope
+	capturedScope environment.Scope
 	body          *cons.Cons
 }
 
 // NewLambdaFunction creates a new lambda function
-func NewLambdaFunction(argList []*symbols.Symbol, capturedScope scope.Scope, body *cons.Cons) *LambdaFunction {
+func NewLambdaFunction(argList []*symbols.Symbol, capturedScope environment.Scope, body *cons.Cons) *LambdaFunction {
 	return &LambdaFunction{
 		argList:       argList,
 		capturedScope: capturedScope,
@@ -145,9 +144,9 @@ func (fun *LambdaFunction) Eval(args *cons.Cons, env environment.Environment) (t
 
 	// Add binding for &rest symbol with remaining args
 	if args != nil {
-		env.AddBinding(defaultEnvironment.AndRestSymbol, args)
+		env.AddBinding(globals.AndRestSymbol, args)
 	} else {
-		env.AddBinding(defaultEnvironment.AndRestSymbol, types.NIL)
+		env.AddBinding(globals.AndRestSymbol, types.NIL)
 	}
 
 	// Evaluate body
@@ -156,7 +155,7 @@ func (fun *LambdaFunction) Eval(args *cons.Cons, env environment.Environment) (t
 
 	if fun.body != nil {
 		err = fun.body.Iter(func(obj types.Object, index uint64) error {
-			result, err = evaluator.Eval(obj, env)
+			result, err = env.Eval(obj)
 			return err
 		})
 

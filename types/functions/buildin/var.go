@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/almerlucke/glisp/evaluator"
 	"github.com/almerlucke/glisp/interfaces/environment"
 	"github.com/almerlucke/glisp/types"
 	"github.com/almerlucke/glisp/types/cons"
@@ -29,7 +28,7 @@ func Var(args *cons.Cons, env environment.Environment) (types.Object, error) {
 
 	if args.Cdr.Type() == types.Cons {
 		args = args.Cdr.(*cons.Cons)
-		val, err = evaluator.Eval(args.Car, env)
+		val, err = env.Eval(args.Car)
 		if err != nil {
 			return nil, err
 		}

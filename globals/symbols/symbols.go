@@ -1,4 +1,4 @@
-package environment
+package symbols
 
 import (
 	"github.com/almerlucke/glisp/types"

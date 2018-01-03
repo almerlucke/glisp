@@ -1,11 +1,9 @@
-package glisp
+package tables
 
 import (
-	"github.com/almerlucke/glisp/environment"
-	"github.com/almerlucke/glisp/reader"
+	"github.com/almerlucke/glisp/interfaces/reader"
 	"github.com/almerlucke/glisp/reader/macros"
 	"github.com/almerlucke/glisp/reader/macros/dispatch"
-	"github.com/almerlucke/glisp/types/functions/buildin"
 )
 
 // DefaultReadTable contains the default reader characters and syntax types
@@ -13,36 +11,6 @@ var DefaultReadTable = generateDefaultReadTable()
 
 // DefaultDispatchTable contains the default reader dispatch table
 var DefaultDispatchTable = generateDefaultDispatchTable()
-
-// CreateDefaultEnvironment creates a default GLisp environment
-func CreateDefaultEnvironment() *environment.Environment {
-	env := environment.New()
-
-	env.Context()["defaultReadTable"] = DefaultReadTable
-	env.Context()["defaultDispatchTable"] = DefaultDispatchTable
-
-	env.AddGlobalBinding(environment.QuoteSymbol, buildin.CreateBuildinQuote())
-	env.AddGlobalBinding(environment.BackquoteSymbol, buildin.CreateBuildinBackquote())
-	env.AddGlobalBinding(environment.UnquoteSymbol, buildin.CreateBuildinUnquote())
-	env.AddGlobalBinding(environment.SpliceSymbol, buildin.CreateBuildinUnquote())
-
-	env.AddGlobalBinding(env.DefineSymbol("LIST", true, nil), buildin.CreateBuildinList())
-	env.AddGlobalBinding(env.DefineSymbol("CDR", true, nil), buildin.CreateBuildinCdr())
-	env.AddGlobalBinding(env.DefineSymbol("CAR", true, nil), buildin.CreateBuildinCar())
-	env.AddGlobalBinding(env.DefineSymbol("CONS", true, nil), buildin.CreateBuildinCons())
-	env.AddGlobalBinding(env.DefineSymbol("LAMBDA", true, nil), buildin.CreateBuildinLambda())
-	env.AddGlobalBinding(env.DefineSymbol("PRINT", true, nil), buildin.CreateBuildinPrint())
-	env.AddGlobalBinding(env.DefineSymbol("EXIT", true, nil), buildin.CreateBuildinExit())
-	env.AddGlobalBinding(env.DefineSymbol("LOAD", true, nil), buildin.CreateBuildinLoad())
-	env.AddGlobalBinding(env.DefineSymbol("VAR", true, nil), buildin.CreateBuildinVar())
-	env.AddGlobalBinding(env.DefineSymbol("=", true, nil), buildin.CreateBuildinAssign())
-	env.AddGlobalBinding(env.DefineSymbol("SCOPE", true, nil), buildin.CreateBuildinScope())
-	env.AddGlobalBinding(env.DefineSymbol("EVAL", true, nil), buildin.CreateBuildinEval())
-	env.AddGlobalBinding(env.DefineSymbol("ELT", true, nil), buildin.CreateBuildinElt())
-	env.AddGlobalBinding(env.DefineSymbol("HASHTABLE", true, nil), buildin.CreateBuildinHashTable())
-
-	return env
-}
 
 func generateDefaultDispatchTable() reader.DispatchTable {
 	table := map[rune]reader.DispatchMacroFunction{

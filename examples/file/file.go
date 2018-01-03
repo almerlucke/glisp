@@ -6,8 +6,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/almerlucke/glisp"
-	"github.com/almerlucke/glisp/evaluator"
+	"github.com/almerlucke/glisp/environment"
+	"github.com/almerlucke/glisp/globals/tables"
 	"github.com/almerlucke/glisp/reader"
 	"github.com/almerlucke/glisp/types"
 )
@@ -20,14 +20,14 @@ func main() {
 
 	defer f.Close()
 
-	env := glisp.CreateDefaultEnvironment()
-	rd := reader.New(bufio.NewReader(f), glisp.DefaultReadTable, glisp.DefaultDispatchTable, env)
+	env := environment.New()
+	rd := reader.New(bufio.NewReader(f), tables.DefaultReadTable, tables.DefaultDispatchTable, env)
 
 	obj, err := rd.ReadObject()
 	var result types.Object
 
 	for err == nil {
-		result, err = evaluator.Eval(obj, env)
+		result, err = env.Eval(obj)
 		if err != nil {
 			log.Fatalf("eval error %v\n", rd.ErrorWithError(err))
 		}

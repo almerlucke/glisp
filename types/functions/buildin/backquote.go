@@ -3,8 +3,7 @@ package buildin
 import (
 	"errors"
 
-	defaultEnvironment "github.com/almerlucke/glisp/environment"
-	"github.com/almerlucke/glisp/evaluator"
+	"github.com/almerlucke/glisp/globals/symbols"
 	"github.com/almerlucke/glisp/interfaces/environment"
 	"github.com/almerlucke/glisp/types"
 	"github.com/almerlucke/glisp/types/cons"
@@ -23,25 +22,25 @@ func expansion(obj types.Object, env environment.Environment) (types.Object, err
 		if car.Type() == types.Cons {
 			l := car.(*cons.Cons)
 
-			if l.Car == defaultEnvironment.UnquoteSymbol {
+			if l.Car == symbols.UnquoteSymbol {
 				// Unquote arg
 				if l.Cdr.Type() != types.Cons {
 					return errors.New("unquote needs one argument")
 				}
 
-				result, err := evaluator.Eval(l.Cdr.(*cons.Cons).Car, env)
+				result, err := env.Eval(l.Cdr.(*cons.Cons).Car)
 				if err != nil {
 					return err
 				}
 
 				builder.PushBackObject(result)
-			} else if l.Car == defaultEnvironment.SpliceSymbol {
+			} else if l.Car == symbols.SpliceSymbol {
 				// Splice arg
 				if l.Cdr.Type() != types.Cons {
 					return errors.New("splice needs one argument")
 				}
 
-				result, err := evaluator.Eval(l.Cdr.(*cons.Cons).Car, env)
+				result, err := env.Eval(l.Cdr.(*cons.Cons).Car)
 				if err != nil {
 					return err
 				}
@@ -51,7 +50,7 @@ func expansion(obj types.Object, env environment.Environment) (types.Object, err
 				}
 
 				builder.Append(result.(*cons.Cons))
-			} else if l.Car == defaultEnvironment.BackquoteSymbol {
+			} else if l.Car == symbols.BackquoteSymbol {
 				// Recursively call backquote
 				if l.Cdr.Type() != types.Cons {
 					return errors.New("backquote needs one argument")
@@ -99,17 +98,17 @@ func Backquote(args *cons.Cons, env environment.Environment) (types.Object, erro
 	// Cast to list
 	l := obj.(*cons.Cons)
 
-	if l.Car == defaultEnvironment.UnquoteSymbol {
+	if l.Car == symbols.UnquoteSymbol {
 		// Unquote arg
 		if l.Cdr.Type() != types.Cons {
 			return nil, errors.New("unquote needs one argument")
 		}
 
-		return evaluator.Eval(l.Cdr.(*cons.Cons).Car, env)
-	} else if l.Car == defaultEnvironment.SpliceSymbol {
+		return env.Eval(l.Cdr.(*cons.Cons).Car)
+	} else if l.Car == symbols.SpliceSymbol {
 		// Splice arg outside list context is an error
 		return nil, errors.New("splice can only be evaluated in a list context")
-	} else if l.Car == defaultEnvironment.BackquoteSymbol {
+	} else if l.Car == symbols.BackquoteSymbol {
 		// Recursively call backquote
 		if l.Cdr.Type() != types.Cons {
 			return nil, errors.New("backquote needs one argument")

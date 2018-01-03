@@ -6,9 +6,10 @@ import (
 	"io"
 	"os"
 
-	"github.com/almerlucke/glisp/evaluator"
+	defaultReader "github.com/almerlucke/glisp/reader"
+
+	"github.com/almerlucke/glisp/globals/tables"
 	"github.com/almerlucke/glisp/interfaces/environment"
-	"github.com/almerlucke/glisp/reader"
 	"github.com/almerlucke/glisp/types"
 	"github.com/almerlucke/glisp/types/cons"
 	"github.com/almerlucke/glisp/types/functions"
@@ -30,16 +31,16 @@ func Load(args *cons.Cons, env environment.Environment) (types.Object, error) {
 
 	defer f.Close()
 
-	readTable := env.Context()["defaultReadTable"].(reader.ReadTable)
-	dispatchTable := env.Context()["defaultDispatchTable"].(reader.DispatchTable)
+	readTable := tables.DefaultReadTable
+	dispatchTable := tables.DefaultDispatchTable
 
-	rd := reader.New(bufio.NewReader(f), readTable, dispatchTable, env)
+	rd := defaultReader.New(bufio.NewReader(f), readTable, dispatchTable, env)
 
 	obj, err := rd.ReadObject()
 	var result types.Object
 
 	for err == nil {
-		result, err = evaluator.Eval(obj, env)
+		result, err = env.Eval(obj)
 		if err != nil {
 			return nil, rd.ErrorWithError(err)
 		}

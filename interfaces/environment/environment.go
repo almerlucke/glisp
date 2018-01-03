@@ -1,20 +1,22 @@
 package environment
 
 import (
-	"github.com/almerlucke/glisp/scope"
 	"github.com/almerlucke/glisp/types"
 	"github.com/almerlucke/glisp/types/symbols"
 )
 
+// Scope holds the bindings of a symbol to an object
+type Scope map[*symbols.Symbol]types.Object
+
 // Environment implements the currently defined symbols and the binding scopes
 type Environment interface {
-	CurrentScope() scope.Scope
+	CurrentScope() Scope
 
-	PopScope() scope.Scope
+	PopScope() Scope
 
-	PushScope(scope scope.Scope) scope.Scope
+	PushScope(scope Scope) Scope
 
-	CaptureScope() scope.Scope
+	CaptureScope() Scope
 
 	AddGlobalBinding(sym *symbols.Symbol, obj types.Object)
 
@@ -29,4 +31,6 @@ type Environment interface {
 	DefineSymbol(name string, reserved bool, value types.Object) *symbols.Symbol
 
 	Context() map[string]interface{}
+
+	Eval(obj types.Object) (types.Object, error)
 }

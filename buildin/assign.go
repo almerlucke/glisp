@@ -5,10 +5,10 @@ import (
 	"fmt"
 
 	"github.com/almerlucke/glisp/interfaces/environment"
+	"github.com/almerlucke/glisp/interfaces/function"
 	"github.com/almerlucke/glisp/types"
 	"github.com/almerlucke/glisp/types/cons"
 	"github.com/almerlucke/glisp/types/functions"
-	"github.com/almerlucke/glisp/types/functions/function"
 	"github.com/almerlucke/glisp/types/symbols"
 )
 

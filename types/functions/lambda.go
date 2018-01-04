@@ -12,47 +12,11 @@ import (
 	globals "github.com/almerlucke/glisp/globals/symbols"
 )
 
-// LambdaEvalContext holds lambda and macro call depth
-type LambdaEvalContext struct {
-	Depth uint64
-}
-
 // LambdaFunction anonymous function
 type LambdaFunction struct {
 	argList       []*symbols.Symbol
 	capturedScope environment.Scope
 	body          *cons.Cons
-}
-
-// getLambdaEvalContext gets lambda call context
-func getLambdaEvalContext(env environment.Environment) *LambdaEvalContext {
-	ctx, ok := env.Context()["LambdaEvalContext"]
-	if ok {
-		return ctx.(*LambdaEvalContext)
-	}
-
-	ctx = &LambdaEvalContext{}
-	env.Context()["LambdaEvalContext"] = ctx
-
-	return ctx.(*LambdaEvalContext)
-}
-
-// PushLambdaEvalCall push
-func PushLambdaEvalCall(env environment.Environment) {
-	ctx := getLambdaEvalContext(env)
-	ctx.Depth++
-}
-
-// PopLambdaEvalCall pop
-func PopLambdaEvalCall(env environment.Environment) {
-	ctx := getLambdaEvalContext(env)
-	ctx.Depth--
-}
-
-// IsInsideLambdaEval return true if lambda eval context depth is not 0
-func IsInsideLambdaEval(env environment.Environment) bool {
-	ctx := getLambdaEvalContext(env)
-	return ctx.Depth > 0
 }
 
 // NewLambdaFunction creates a new lambda function
@@ -93,7 +57,7 @@ func (fun *LambdaFunction) Eval(args *cons.Cons, env environment.Environment, co
 	env.PushScope(nil)
 
 	// Push call
-	PushLambdaEvalCall(env)
+	env.PushDepthContext("CallDepth")
 
 	// Pop both local and captured scopes, even when an error occurs
 	defer func() {
@@ -102,7 +66,7 @@ func (fun *LambdaFunction) Eval(args *cons.Cons, env environment.Environment, co
 		env.PopScope()
 
 		// Pop call
-		PopLambdaEvalCall(env)
+		env.PopDepthContext("CallDepth")
 
 		if r := recover(); r != nil {
 			// Return value

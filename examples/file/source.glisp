@@ -1,7 +1,14 @@
-(scope
-  (var a '(1 2 3 4))
-  (print (elt a 0))
-  (= (elt a 0) 5)
-  (print (elt a 0))
-  (= (list 1 2) 3)
-)
+(var test (lambda (a)
+  (try
+    (return 1)
+    (progn
+      (print a)
+      (throw "this is an error")
+      (print 2)
+    )
+    (lambda (err) (print err))
+  )
+  (print "normal")
+))
+
+(test 'rest)

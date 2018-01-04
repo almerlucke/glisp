@@ -12,7 +12,7 @@ import (
 
 // Return buildin function
 func Return(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
-	if !functions.IsInsideLambdaEval(env) {
+	if !env.HasDepthContext("CallDepth") {
 		return nil, errors.New("return can only be used inside a macro or lambda body")
 	}
 

@@ -59,7 +59,7 @@ func (fun *MacroFunction) expansion(args *cons.Cons, env environment.Environment
 	env.PushScope(nil)
 
 	// Push call
-	PushLambdaEvalCall(env)
+	env.PushDepthContext("CallDepth")
 
 	defer func() {
 		// Pop scopes
@@ -67,7 +67,7 @@ func (fun *MacroFunction) expansion(args *cons.Cons, env environment.Environment
 		env.PopScope()
 
 		// Pop call
-		PopLambdaEvalCall(env)
+		env.PopDepthContext("CallDepth")
 
 		if r := recover(); r != nil {
 			// Return value

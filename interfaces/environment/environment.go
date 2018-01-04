@@ -32,7 +32,13 @@ type Environment interface {
 
 	Gensym() *symbols.Symbol
 
+	Eval(obj types.Object, context interface{}) (types.Object, error)
+
 	Context() map[string]interface{}
 
-	Eval(obj types.Object, context interface{}) (types.Object, error)
+	PushDepthContext(string)
+
+	PopDepthContext(string)
+
+	HasDepthContext(string) bool
 }

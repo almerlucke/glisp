@@ -82,6 +82,9 @@ func New() *Environment {
 	env.AddGlobalBinding(env.DefineSymbol("MAKE-ARRAY", true, nil), buildin.CreateBuildinMakeArray())
 	env.AddGlobalBinding(env.DefineSymbol("IF", true, nil), buildin.CreateBuildinIf())
 	env.AddGlobalBinding(env.DefineSymbol("PROGN", true, nil), buildin.CreateBuildinProgn())
+	env.AddGlobalBinding(env.DefineSymbol("TRY", true, nil), buildin.CreateBuildinTry())
+	env.AddGlobalBinding(env.DefineSymbol("THROW", true, nil), buildin.CreateBuildinThrow())
+
 	env.AddGlobalBinding(env.DefineSymbol("HASHTABLE", true, nil), buildin.CreateBuildinHashTable())
 
 	return env
@@ -202,6 +205,30 @@ func (env *Environment) DefineSymbol(name string, reserved bool, value types.Obj
 // Context returns the environment context
 func (env *Environment) Context() map[string]interface{} {
 	return env.context
+}
+
+// PushDepthContext push specific depth context type
+func (env *Environment) PushDepthContext(d string) {
+	ctx, ok := env.context[d]
+	if ok {
+		env.context[d] = ctx.(uint64) + 1
+	} else {
+		env.context[d] = uint64(1)
+	}
+}
+
+// PopDepthContext pop specific depth context type
+func (env *Environment) PopDepthContext(d string) {
+	ctx, ok := env.context[d]
+	if ok {
+		env.context[d] = ctx.(uint64) - 1
+	}
+}
+
+// HasDepthContext check if specific depth context type is set
+func (env *Environment) HasDepthContext(d string) bool {
+	ctx, ok := env.context[d]
+	return ok && ctx.(uint64) > 0
 }
 
 // Eval evaluates an object with this environment

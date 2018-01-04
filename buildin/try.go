@@ -29,9 +29,6 @@ func Try(args *cons.Cons, env environment.Environment, context interface{}) (res
 	defer func() {
 		env.PopDepthContext("TryDepth")
 
-		// Alway evaluate always part
-		env.Eval(alwaysPart, context)
-
 		if r := recover(); r != nil {
 			tctx, ok := r.(*tryContext)
 			if ok {
@@ -41,11 +38,17 @@ func Try(args *cons.Cons, env environment.Environment, context interface{}) (res
 					lb.PushBackObject(catchPart)
 					lb.PushBackObject(strings.String(tctx.Err))
 					result, err = env.Eval(lb.Head, context)
+
+					// Evaluate always part
+					env.Eval(alwaysPart, context)
 				}
 			} else {
 				// Continue to panic
 				panic(r)
 			}
+		} else {
+			// Evaluate always part
+			env.Eval(alwaysPart, context)
 		}
 	}()
 

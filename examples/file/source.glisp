@@ -1,14 +1,24 @@
+
 (var test (lambda (a)
   (try
-    (return 1)
     (progn
       (print a)
-      (throw "this is an error")
       (print 2)
     )
     (lambda (err) (print err))
+    (print "always")
   )
   (print "normal")
 ))
 
-(test 'rest)
+#|
+(var when
+  (macro (condition)
+    `(if ,condition (progn ,@&rest))
+  )
+)
+
+(lambda () (print 3))
+
+(when (+ 1 2) (print 1) (print 2))
+|#

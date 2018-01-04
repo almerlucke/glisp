@@ -84,8 +84,7 @@ func New() *Environment {
 	env.AddGlobalBinding(env.DefineSymbol("PROGN", true, nil), buildin.CreateBuildinProgn())
 	env.AddGlobalBinding(env.DefineSymbol("TRY", true, nil), buildin.CreateBuildinTry())
 	env.AddGlobalBinding(env.DefineSymbol("THROW", true, nil), buildin.CreateBuildinThrow())
-
-	env.AddGlobalBinding(env.DefineSymbol("HASHTABLE", true, nil), buildin.CreateBuildinHashTable())
+	env.AddGlobalBinding(env.DefineSymbol("DICTIONARY", true, nil), buildin.CreateBuildinDictionary())
 
 	return env
 }

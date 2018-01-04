@@ -20,8 +20,8 @@ const (
 	Number
 	// Function object type
 	Function
-	// HashTable object type
-	HashTable
+	// Dictionary object type
+	Dictionary
 	// Array object type
 	Array
 )

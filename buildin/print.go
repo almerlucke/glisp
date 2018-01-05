@@ -12,9 +12,9 @@ import (
 // Print buildin function
 func Print(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	if args != nil {
-		args.Iter(func(obj types.Object, index interface{}) error {
+		args.Iter(func(obj types.Object, index interface{}) (bool, error) {
 			fmt.Printf("%v\n", obj)
-			return nil
+			return false, nil
 		})
 	}
 

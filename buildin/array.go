@@ -16,9 +16,9 @@ import (
 func Array(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	a := make(array.Array, args.Length())
 
-	_ = args.Iter(func(obj types.Object, index interface{}) error {
+	_ = args.Iter(func(obj types.Object, index interface{}) (bool, error) {
 		a[index.(uint64)] = obj
-		return nil
+		return false, nil
 	})
 
 	return a, nil

@@ -18,9 +18,9 @@ func Scope(args *cons.Cons, env environment.Environment, context interface{}) (t
 	var val types.Object = types.NIL
 	var err error
 
-	err = args.Iter(func(obj types.Object, index interface{}) error {
+	err = args.Iter(func(obj types.Object, index interface{}) (bool, error) {
 		val, err = env.Eval(obj, context)
-		return err
+		return false, err
 	})
 
 	if err != nil {

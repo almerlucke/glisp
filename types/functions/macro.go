@@ -106,9 +106,9 @@ func (fun *MacroFunction) expansion(args *cons.Cons, env environment.Environment
 
 	// Expand macro body
 	if fun.body != nil {
-		err = fun.body.Iter(func(obj types.Object, index interface{}) error {
+		err = fun.body.Iter(func(obj types.Object, index interface{}) (bool, error) {
 			result, err = env.Eval(obj, context)
-			return err
+			return false, err
 		})
 
 		if err != nil {

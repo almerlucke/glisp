@@ -14,20 +14,20 @@ import (
 func Dictionary(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	dictionary := make(dictionaries.Dictionary)
 
-	err := args.Iter(func(obj types.Object, index interface{}) error {
+	err := args.Iter(func(obj types.Object, index interface{}) (bool, error) {
 		if obj.Type() != types.Cons {
-			return errors.New("illegal key value pair for dictionary")
+			return false, errors.New("illegal key value pair for dictionary")
 		}
 
 		pair := obj.(*cons.Cons)
 		if pair.Length() != 2 {
-			return errors.New("illegal key value pair for dictionary")
+			return false, errors.New("illegal key value pair for dictionary")
 		}
 
 		key := pair.Car
 		value := pair.Cdr.(*cons.Cons).Car
 
-		return dictionary.Assign(key, value)
+		return false, dictionary.Assign(key, value)
 	})
 
 	if err != nil {

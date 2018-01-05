@@ -100,15 +100,15 @@ func (c *Cons) Info() (bool, int64) {
 func (c *Cons) Map(fun collection.MapFun) (collection.Collection, error) {
 	builder := ListBuilder{}
 
-	err := c.Iter(func(obj types.Object, index interface{}) error {
+	err := c.Iter(func(obj types.Object, index interface{}) (bool, error) {
 		car, err := fun(obj, index)
 		if err != nil {
-			return err
+			return false, err
 		}
 
 		builder.PushBackObject(car)
 
-		return nil
+		return false, nil
 	})
 
 	if err != nil {
@@ -123,9 +123,13 @@ func (c *Cons) Iter(fun collection.IterFun) error {
 	index := uint64(0)
 
 	for e := types.Object(c); e.Type() == types.Cons; e = e.(*Cons).Cdr {
-		err := fun(e.(*Cons).Car, index)
+		stop, err := fun(e.(*Cons).Car, index)
 		if err != nil {
 			return err
+		}
+
+		if stop {
+			break
 		}
 
 		index++

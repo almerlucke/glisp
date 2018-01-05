@@ -85,6 +85,7 @@ func New() *Environment {
 	env.AddGlobalBinding(env.DefineSymbol("TRY", true, nil), buildin.CreateBuildinTry())
 	env.AddGlobalBinding(env.DefineSymbol("THROW", true, nil), buildin.CreateBuildinThrow())
 	env.AddGlobalBinding(env.DefineSymbol("DICTIONARY", true, nil), buildin.CreateBuildinDictionary())
+	env.AddGlobalBinding(env.DefineSymbol("AND", true, nil), buildin.CreateBuildinAnd())
 
 	return env
 }

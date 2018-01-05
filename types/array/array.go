@@ -64,9 +64,13 @@ func (a Array) Length() uint64 {
 // Iter over array elements
 func (a Array) Iter(f collection.IterFun) error {
 	for i, e := range a {
-		err := f(e, uint64(i))
+		stop, err := f(e, uint64(i))
 		if err != nil {
 			return err
+		}
+
+		if stop {
+			break
 		}
 	}
 

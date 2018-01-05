@@ -32,18 +32,18 @@ func Macro(args *cons.Cons, env environment.Environment, context interface{}) (t
 		symList = make([]*symbols.Symbol, length)
 
 		// Build sym arg slice
-		err := argList.Iter(func(obj types.Object, index interface{}) error {
+		err := argList.Iter(func(obj types.Object, index interface{}) (bool, error) {
 			if obj.Type() != types.Symbol {
-				return errors.New("macro arg list must contain only symbols")
+				return false, errors.New("macro arg list must contain only symbols")
 			}
 
 			if obj.(*symbols.Symbol).Reserved {
-				return fmt.Errorf("macro arg list contains reserved symbol %v", obj.(*symbols.Symbol))
+				return false, fmt.Errorf("macro arg list contains reserved symbol %v", obj.(*symbols.Symbol))
 			}
 
 			symList[index.(uint64)] = obj.(*symbols.Symbol)
 
-			return nil
+			return false, nil
 		})
 
 		if err != nil {

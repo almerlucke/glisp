@@ -18,47 +18,47 @@ func expansion(obj types.Object, env environment.Environment, context interface{
 
 	builder := cons.ListBuilder{}
 
-	err := obj.(*cons.Cons).Iter(func(car types.Object, index interface{}) error {
+	err := obj.(*cons.Cons).Iter(func(car types.Object, index interface{}) (bool, error) {
 		if car.Type() == types.Cons {
 			l := car.(*cons.Cons)
 
 			if l.Car == symbols.UnquoteSymbol {
 				// Unquote arg
 				if l.Cdr.Type() != types.Cons {
-					return errors.New("unquote needs one argument")
+					return false, errors.New("unquote needs one argument")
 				}
 
 				result, err := env.Eval(l.Cdr.(*cons.Cons).Car, context)
 				if err != nil {
-					return err
+					return false, err
 				}
 
 				builder.PushBackObject(result)
 			} else if l.Car == symbols.SpliceSymbol {
 				// Splice arg
 				if l.Cdr.Type() != types.Cons {
-					return errors.New("splice needs one argument")
+					return false, errors.New("splice needs one argument")
 				}
 
 				result, err := env.Eval(l.Cdr.(*cons.Cons).Car, context)
 				if err != nil {
-					return err
+					return false, err
 				}
 
 				if result.Type() != types.Cons {
-					return errors.New("splice result must be a list")
+					return false, errors.New("splice result must be a list")
 				}
 
 				builder.Append(result.(*cons.Cons))
 			} else if l.Car == symbols.BackquoteSymbol {
 				// Recursively call backquote
 				if l.Cdr.Type() != types.Cons {
-					return errors.New("backquote needs one argument")
+					return false, errors.New("backquote needs one argument")
 				}
 
 				result, err := Backquote(l.Cdr.(*cons.Cons), env, context)
 				if err != nil {
-					return err
+					return false, err
 				}
 
 				builder.PushBackObject(result)
@@ -66,7 +66,7 @@ func expansion(obj types.Object, env environment.Environment, context interface{
 				// Expand list
 				result, err := expansion(l, env, context)
 				if err != nil {
-					return err
+					return false, err
 				}
 
 				builder.PushBackObject(result)
@@ -76,7 +76,7 @@ func expansion(obj types.Object, env environment.Environment, context interface{
 			builder.PushBackObject(car)
 		}
 
-		return nil
+		return false, nil
 	})
 
 	if err != nil {

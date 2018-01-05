@@ -67,9 +67,13 @@ func (d Dictionary) Map(fun collection.MapFun) (collection.Collection, error) {
 // Iter iterates over dictionary
 func (d Dictionary) Iter(fun collection.IterFun) error {
 	for _, v := range d {
-		err := fun(v.value, v.originalKey)
+		stop, err := fun(v.value, v.originalKey)
 		if err != nil {
 			return err
+		}
+
+		if stop {
+			break
 		}
 	}
 

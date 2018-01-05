@@ -8,7 +8,7 @@ import (
 type MapFun func(obj types.Object, index interface{}) (types.Object, error)
 
 // IterFun function to iterate over list
-type IterFun func(obj types.Object, index interface{}) error
+type IterFun func(obj types.Object, index interface{}) (bool, error)
 
 // Collection interface
 type Collection interface {

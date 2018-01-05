@@ -12,9 +12,9 @@ func Progn(args *cons.Cons, env environment.Environment, context interface{}) (t
 	var result types.Object = types.NIL
 	var err error
 
-	err = args.Iter(func(obj types.Object, index interface{}) error {
+	err = args.Iter(func(obj types.Object, index interface{}) (bool, error) {
 		result, err = env.Eval(obj, context)
-		return err
+		return false, err
 	})
 
 	return result, err

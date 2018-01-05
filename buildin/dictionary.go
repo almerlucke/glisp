@@ -14,7 +14,7 @@ import (
 func Dictionary(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	dictionary := make(dictionaries.Dictionary)
 
-	err := args.Iter(func(obj types.Object, index uint64) error {
+	err := args.Iter(func(obj types.Object, index interface{}) error {
 		if obj.Type() != types.Cons {
 			return errors.New("illegal key value pair for dictionary")
 		}
@@ -27,7 +27,7 @@ func Dictionary(args *cons.Cons, env environment.Environment, context interface{
 		key := pair.Car
 		value := pair.Cdr.(*cons.Cons).Car
 
-		return dictionary.Set(key, value)
+		return dictionary.Assign(key, value)
 	})
 
 	if err != nil {

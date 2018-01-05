@@ -18,7 +18,7 @@ func expansion(obj types.Object, env environment.Environment, context interface{
 
 	builder := cons.ListBuilder{}
 
-	err := obj.(*cons.Cons).Iter(func(car types.Object, index uint64) error {
+	err := obj.(*cons.Cons).Iter(func(car types.Object, index interface{}) error {
 		if car.Type() == types.Cons {
 			l := car.(*cons.Cons)
 

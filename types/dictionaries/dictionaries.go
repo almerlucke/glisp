@@ -3,7 +3,9 @@ package dictionaries
 import (
 	"fmt"
 
+	"github.com/almerlucke/glisp/interfaces/collection"
 	"github.com/almerlucke/glisp/types"
+
 	"github.com/mitchellh/hashstructure"
 )
 
@@ -38,26 +40,68 @@ func (d Dictionary) String() string {
 	return str + ")"
 }
 
-// Get a value
-func (d Dictionary) Get(key types.Object) (types.Object, error) {
+// Length of dictionary
+func (d Dictionary) Length() uint64 {
+	return uint64(len(d))
+}
+
+// Map maps over dictionary
+func (d Dictionary) Map(fun collection.MapFun) (collection.Collection, error) {
+	nd := make(Dictionary)
+
+	for k, v := range d {
+		nv, err := fun(v.value, v.originalKey)
+		if err != nil {
+			return nil, err
+		}
+
+		nd[k] = &dictionaryEntry{
+			originalKey: v.originalKey,
+			value:       nv,
+		}
+	}
+
+	return nd, nil
+}
+
+// Iter iterates over dictionary
+func (d Dictionary) Iter(fun collection.IterFun) error {
+	for _, v := range d {
+		err := fun(v.value, v.originalKey)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// Access a dictionary element
+func (d Dictionary) Access(key interface{}) (types.Object, error) {
 	hash, err := hashstructure.Hash(key, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	return d[hash].value, nil
+	v := d[hash]
+
+	if v == nil {
+		return types.NIL, nil
+	}
+
+	return v.value, nil
 }
 
-// Set a value to a key
-func (d Dictionary) Set(k types.Object, v types.Object) error {
-	hash, err := hashstructure.Hash(k, nil)
+// Assign to a dictionary key
+func (d Dictionary) Assign(key interface{}, val types.Object) error {
+	hash, err := hashstructure.Hash(key, nil)
 	if err != nil {
 		return err
 	}
 
 	d[hash] = &dictionaryEntry{
-		originalKey: k,
-		value:       v,
+		originalKey: key.(types.Object),
+		value:       val,
 	}
 
 	return nil

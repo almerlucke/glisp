@@ -2,10 +2,12 @@ package cons
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 
-	"github.com/almerlucke/glisp/interfaces/sequence"
+	"github.com/almerlucke/glisp/interfaces/collection"
 	"github.com/almerlucke/glisp/types"
+	"github.com/almerlucke/glisp/types/numbers"
 )
 
 // Cons is the main list structure
@@ -95,11 +97,11 @@ func (c *Cons) Info() (bool, int64) {
 }
 
 // Map maps a function over a cons and returns a new cons
-func (c *Cons) Map(fun sequence.MapFun) (sequence.Sequence, error) {
+func (c *Cons) Map(fun collection.MapFun) (collection.Collection, error) {
 	builder := ListBuilder{}
 
-	err := c.Iter(func(obj types.Object, index uint64) error {
-		car, err := fun(obj)
+	err := c.Iter(func(obj types.Object, index interface{}) error {
+		car, err := fun(obj, index)
 		if err != nil {
 			return err
 		}
@@ -117,7 +119,7 @@ func (c *Cons) Map(fun sequence.MapFun) (sequence.Sequence, error) {
 }
 
 // Iter over a list
-func (c *Cons) Iter(fun sequence.IterFun) error {
+func (c *Cons) Iter(fun collection.IterFun) error {
 	index := uint64(0)
 
 	for e := types.Object(c); e.Type() == types.Cons; e = e.(*Cons).Cdr {
@@ -133,32 +135,54 @@ func (c *Cons) Iter(fun sequence.IterFun) error {
 }
 
 // Access access the nth element
-func (c *Cons) Access(nth uint64) types.Object {
-	index := uint64(0)
-
-	for e := types.Object(c); e.Type() == types.Cons; e = e.(*Cons).Cdr {
-		if index == nth {
-			return e.(*Cons).Car
-		}
-
-		index++
+func (c *Cons) Access(index interface{}) (types.Object, error) {
+	num, ok := index.(*numbers.Number)
+	if !ok {
+		return nil, errors.New("list expects a number index")
 	}
 
-	return nil
+	nth := num.Int64Value()
+	if nth < 0 {
+		return nil, errors.New("index out of bounds")
+	}
+
+	unth := uint64(nth)
+	cnt := uint64(0)
+
+	for e := types.Object(c); e.Type() == types.Cons; e = e.(*Cons).Cdr {
+		if cnt == unth {
+			return e.(*Cons).Car, nil
+		}
+
+		cnt++
+	}
+
+	return nil, errors.New("index out of bounds")
 }
 
 // Assign a new value to the nth cons car
-func (c *Cons) Assign(nth uint64, val types.Object) bool {
-	index := uint64(0)
-
-	for e := types.Object(c); e.Type() == types.Cons; e = e.(*Cons).Cdr {
-		if index == nth {
-			e.(*Cons).Car = val
-			return true
-		}
-
-		index++
+func (c *Cons) Assign(index interface{}, val types.Object) error {
+	num, ok := index.(*numbers.Number)
+	if !ok {
+		return errors.New("list expects a number index")
 	}
 
-	return false
+	nth := num.Int64Value()
+	if nth < 0 {
+		return errors.New("index out of bounds")
+	}
+
+	unth := uint64(nth)
+	cnt := uint64(0)
+
+	for e := types.Object(c); e.Type() == types.Cons; e = e.(*Cons).Cdr {
+		if cnt == unth {
+			e.(*Cons).Car = val
+			return nil
+		}
+
+		cnt++
+	}
+
+	return errors.New("index out of bounds")
 }

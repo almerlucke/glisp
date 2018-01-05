@@ -275,7 +275,7 @@ func (env *Environment) Eval(obj types.Object, context interface{}) (types.Objec
 		if c.Cdr != types.NIL {
 			args = c.Cdr.(*cons.Cons)
 			if fun.EvalArgs() {
-				seq, serr := args.Map(func(obj types.Object) (types.Object, error) {
+				col, serr := args.Map(func(obj types.Object, index interface{}) (types.Object, error) {
 					return env.Eval(obj, context)
 				})
 
@@ -283,7 +283,7 @@ func (env *Environment) Eval(obj types.Object, context interface{}) (types.Objec
 					return nil, serr
 				}
 
-				args = seq.(*cons.Cons)
+				args = col.(*cons.Cons)
 			}
 		}
 

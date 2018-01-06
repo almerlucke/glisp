@@ -5,6 +5,7 @@ import (
 
 	"github.com/almerlucke/glisp/interfaces/environment"
 	"github.com/almerlucke/glisp/interfaces/function"
+	"github.com/almerlucke/glisp/scope"
 	"github.com/almerlucke/glisp/types"
 	"github.com/almerlucke/glisp/types/cons"
 	"github.com/almerlucke/glisp/types/symbols"
@@ -17,12 +18,12 @@ import (
 // is evaluated again
 type MacroFunction struct {
 	argList       []*symbols.Symbol
-	capturedScope environment.Scope
+	capturedScope scope.Scope
 	body          *cons.Cons
 }
 
 // NewMacroFunction creates a new macro function
-func NewMacroFunction(argList []*symbols.Symbol, capturedScope environment.Scope, body *cons.Cons) *MacroFunction {
+func NewMacroFunction(argList []*symbols.Symbol, capturedScope scope.Scope, body *cons.Cons) *MacroFunction {
 	return &MacroFunction{
 		argList:       argList,
 		capturedScope: capturedScope,

@@ -16,7 +16,7 @@ import (
 func main() {
 	env := environment.New()
 
-	fmt.Printf("\nGLISP v0.1 -- use (exit) to quit\n\n> ")
+	fmt.Printf("\nGLISP v0.1 -- use (exit) to quit\n\n%v> ", env.CurrentNamespace().Name())
 
 	scanner := bufio.NewScanner(os.Stdin)
 
@@ -43,6 +43,6 @@ func main() {
 			fmt.Printf("%v\n", result)
 		}
 
-		fmt.Printf("> ")
+		fmt.Printf("%v> ", env.CurrentNamespace().Name())
 	}
 }

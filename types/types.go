@@ -24,6 +24,8 @@ const (
 	Dictionary
 	// Array object type
 	Array
+	// Namespace object type
+	Namespace
 )
 
 // Object interface, every Lisp object must implement these methods

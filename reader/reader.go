@@ -7,6 +7,7 @@ import (
 	"io"
 	"reflect"
 	"strconv"
+	"strings"
 	"unicode"
 
 	"github.com/almerlucke/glisp/interfaces/environment"
@@ -14,6 +15,7 @@ import (
 	"github.com/almerlucke/glisp/reader/utils"
 	"github.com/almerlucke/glisp/types"
 	"github.com/almerlucke/glisp/types/numbers"
+	"github.com/almerlucke/glisp/types/symbols"
 )
 
 // Reader implements the Lisp reader interface
@@ -174,7 +176,7 @@ func (rd *Reader) skipWhitespace() error {
 	return err
 }
 
-func (rd *Reader) tokenToObject(token string) types.Object {
+func (rd *Reader) tokenToObject(token string) (types.Object, error) {
 	if utils.IsInteger(token) {
 		i, err := strconv.ParseInt(token, 10, 64)
 		if err != nil {
@@ -184,7 +186,7 @@ func (rd *Reader) tokenToObject(token string) types.Object {
 		return &numbers.Number{
 			Kind:  reflect.Int64,
 			Value: i,
-		}
+		}, nil
 	} else if utils.IsFloat(token) {
 		f, err := strconv.ParseFloat(token, 64)
 		if err != nil {
@@ -194,16 +196,36 @@ func (rd *Reader) tokenToObject(token string) types.Object {
 		return &numbers.Number{
 			Kind:  reflect.Float64,
 			Value: f,
+		}, nil
+	}
+
+	var sym *symbols.Symbol
+
+	if utils.IsKeyword(token) {
+		sym = rd.env.InternKeyword(strings.TrimPrefix(token, ":"))
+	} else {
+		ns, name, interned := utils.SplitNamespace(token)
+		if ns != "" {
+			if interned {
+				sym = rd.env.FindInternedSymbolInNamespace(name, ns)
+			} else {
+				sym = rd.env.FindExportedSymbolInNamespace(name, ns)
+			}
+
+			if sym == nil {
+				return nil, fmt.Errorf("unknown symbol %v in namespace %v", name, ns)
+			}
+		} else {
+			sym = rd.env.InternSymbol(token)
 		}
 	}
 
-	sym := rd.env.DefineSymbol(token, false, nil)
 	if sym.Value != nil {
 		// Symbol has a self referencing value, return value instead of symbol
-		return sym.Value
+		return sym.Value, nil
 	}
 
-	return sym
+	return sym, nil
 }
 
 func (rd *Reader) parseToken() (types.Object, error) {
@@ -259,7 +281,7 @@ func (rd *Reader) parseToken() (types.Object, error) {
 		c, ci, err = rd.ReadChar()
 	}
 
-	return rd.tokenToObject(string(utils.RuneListToSlice(cl))), nil
+	return rd.tokenToObject(string(utils.RuneListToSlice(cl)))
 }
 
 // DispatchMacroForCharacter returns a dispatch macro for a character

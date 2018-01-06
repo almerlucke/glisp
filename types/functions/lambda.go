@@ -5,6 +5,7 @@ import (
 
 	"github.com/almerlucke/glisp/interfaces/environment"
 	"github.com/almerlucke/glisp/interfaces/function"
+	"github.com/almerlucke/glisp/scope"
 	"github.com/almerlucke/glisp/types"
 	"github.com/almerlucke/glisp/types/cons"
 	"github.com/almerlucke/glisp/types/symbols"
@@ -15,12 +16,12 @@ import (
 // LambdaFunction anonymous function
 type LambdaFunction struct {
 	argList       []*symbols.Symbol
-	capturedScope environment.Scope
+	capturedScope scope.Scope
 	body          *cons.Cons
 }
 
 // NewLambdaFunction creates a new lambda function
-func NewLambdaFunction(argList []*symbols.Symbol, capturedScope environment.Scope, body *cons.Cons) *LambdaFunction {
+func NewLambdaFunction(argList []*symbols.Symbol, capturedScope scope.Scope, body *cons.Cons) *LambdaFunction {
 	return &LambdaFunction{
 		argList:       argList,
 		capturedScope: capturedScope,

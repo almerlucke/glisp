@@ -1,24 +1,11 @@
+(namespace :test (:use :glisp) (:export :test))
 
-(var test (lambda (a)
-  (try
-    (progn
-      (print a)
-      (print 2)
-    )
-    (lambda (err) (print err))
-    (print "always")
-  )
-  (print "normal")
-))
+(in-namespace :test)
 
-#|
-(var when
-  (macro (condition)
-    `(if ,condition (progn ,@&rest))
-  )
-)
+(var test "dit is een test")
 
-(lambda () (print 3))
+(in-namespace :glisp-user)
 
-(when (+ 1 2) (print 1) (print 2))
-|#
+(use-namespace :test)
+
+(print test)

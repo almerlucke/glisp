@@ -8,10 +8,12 @@ import (
 	globals "github.com/almerlucke/glisp/globals/symbols"
 
 	"github.com/almerlucke/glisp/buildin"
-	"github.com/almerlucke/glisp/interfaces/environment"
 	"github.com/almerlucke/glisp/interfaces/function"
+	"github.com/almerlucke/glisp/interfaces/namespace"
+	"github.com/almerlucke/glisp/scope"
 	"github.com/almerlucke/glisp/types"
 	"github.com/almerlucke/glisp/types/cons"
+	"github.com/almerlucke/glisp/types/namespaces"
 	"github.com/almerlucke/glisp/types/symbols"
 )
 
@@ -20,7 +22,7 @@ type Environment struct {
 	// Symbol table holds all defined symbols in the environment
 	symTable map[string]*symbols.Symbol
 
-	// gensymCounter is used to create a unique symbol
+	// gensymCounter is used to create a unique uninterned symbol
 	gensymCounter uint64
 
 	// Scopes can be nested
@@ -28,72 +30,133 @@ type Environment struct {
 
 	// Global scope is always at the end of the list, but also keep
 	// a reference here for ease
-	globalScope environment.Scope
+	globalScope scope.Scope
 
 	// Context can hold all kinds of values
 	context map[string]interface{}
+
+	// Currently used namespace
+	currentNamespace namespace.Namespace
+
+	// Keyword namespace
+	keywordNamespace namespace.Namespace
+
+	// all namespaces
+	namespaces map[string]namespace.Namespace
 }
 
 // New returns a new default environment
 func New() *Environment {
-	globalScope := make(environment.Scope)
+	globalScope := make(scope.Scope)
 	scopes := list.New()
 	scopes.PushFront(globalScope)
 
+	glispNS := namespaces.NewNamespace("GLISP", false)
+	keywordNS := namespaces.NewNamespace("KEYWORD", false)
+	glispUserNS := namespaces.NewNamespace("GLISP-USER", true)
+
 	env := &Environment{
-		globalScope: globalScope,
-		symTable: map[string]*symbols.Symbol{
-			globals.NILSymbol.Name:              globals.NILSymbol,
-			globals.TSymbol.Name:                globals.TSymbol,
-			globals.DotSymbol.Name:              globals.DotSymbol,
-			globals.CloseParenthesisSymbol.Name: globals.CloseParenthesisSymbol,
-			globals.QuoteSymbol.Name:            globals.QuoteSymbol,
-			globals.BackquoteSymbol.Name:        globals.BackquoteSymbol,
-			globals.UnquoteSymbol.Name:          globals.UnquoteSymbol,
-			globals.SpliceSymbol.Name:           globals.SpliceSymbol,
-			globals.AndRestSymbol.Name:          globals.AndRestSymbol,
+		globalScope:      globalScope,
+		currentNamespace: glispNS,
+		keywordNamespace: keywordNS,
+		namespaces: map[string]namespace.Namespace{
+			glispNS.Name():     glispNS,
+			keywordNS.Name():   keywordNS,
+			glispUserNS.Name(): glispUserNS,
 		},
 		scopes:  scopes,
 		context: map[string]interface{}{},
 	}
+
+	glispNS.Add(globals.NILSymbol, true)
+	glispNS.Add(globals.TSymbol, true)
+	glispNS.Add(globals.AndRestSymbol, true)
+	glispNS.Add(globals.BackquoteSymbol, true)
+	glispNS.Add(globals.CloseParenthesisSymbol, true)
+	glispNS.Add(globals.DotSymbol, true)
+	glispNS.Add(globals.QuoteSymbol, true)
+	glispNS.Add(globals.SpliceSymbol, true)
+	glispNS.Add(globals.UnquoteSymbol, true)
 
 	env.AddGlobalBinding(globals.QuoteSymbol, buildin.CreateBuildinQuote())
 	env.AddGlobalBinding(globals.BackquoteSymbol, buildin.CreateBuildinBackquote())
 	env.AddGlobalBinding(globals.UnquoteSymbol, buildin.CreateBuildinUnquote())
 	env.AddGlobalBinding(globals.SpliceSymbol, buildin.CreateBuildinUnquote())
 
-	env.AddGlobalBinding(env.DefineSymbol("LIST", true, nil), buildin.CreateBuildinList())
-	env.AddGlobalBinding(env.DefineSymbol("CDR", true, nil), buildin.CreateBuildinCdr())
-	env.AddGlobalBinding(env.DefineSymbol("CAR", true, nil), buildin.CreateBuildinCar())
-	env.AddGlobalBinding(env.DefineSymbol("CONS", true, nil), buildin.CreateBuildinCons())
-	env.AddGlobalBinding(env.DefineSymbol("LAMBDA", true, nil), buildin.CreateBuildinLambda())
-	env.AddGlobalBinding(env.DefineSymbol("MACRO", true, nil), buildin.CreateBuildinMacro())
-	env.AddGlobalBinding(env.DefineSymbol("GENSYM", true, nil), buildin.CreateBuildinGensym())
-	env.AddGlobalBinding(env.DefineSymbol("PRINT", true, nil), buildin.CreateBuildinPrint())
-	env.AddGlobalBinding(env.DefineSymbol("EXIT", true, nil), buildin.CreateBuildinExit())
-	env.AddGlobalBinding(env.DefineSymbol("RETURN", true, nil), buildin.CreateBuildinReturn())
-	env.AddGlobalBinding(env.DefineSymbol("LOAD", true, nil), buildin.CreateBuildinLoad())
-	env.AddGlobalBinding(env.DefineSymbol("VAR", true, nil), buildin.CreateBuildinVar())
-	env.AddGlobalBinding(env.DefineSymbol("=", true, nil), buildin.CreateBuildinAssign())
-	env.AddGlobalBinding(env.DefineSymbol("SCOPE", true, nil), buildin.CreateBuildinScope())
-	env.AddGlobalBinding(env.DefineSymbol("EVAL", true, nil), buildin.CreateBuildinEval())
-	env.AddGlobalBinding(env.DefineSymbol("ELT", true, nil), buildin.CreateBuildinElt())
-	env.AddGlobalBinding(env.DefineSymbol("ARRAY", true, nil), buildin.CreateBuildinArray())
-	env.AddGlobalBinding(env.DefineSymbol("MAKE-ARRAY", true, nil), buildin.CreateBuildinMakeArray())
-	env.AddGlobalBinding(env.DefineSymbol("IF", true, nil), buildin.CreateBuildinIf())
-	env.AddGlobalBinding(env.DefineSymbol("PROGN", true, nil), buildin.CreateBuildinProgn())
-	env.AddGlobalBinding(env.DefineSymbol("TRY", true, nil), buildin.CreateBuildinTry())
-	env.AddGlobalBinding(env.DefineSymbol("THROW", true, nil), buildin.CreateBuildinThrow())
-	env.AddGlobalBinding(env.DefineSymbol("DICTIONARY", true, nil), buildin.CreateBuildinDictionary())
-	env.AddGlobalBinding(env.DefineSymbol("AND", true, nil), buildin.CreateBuildinAnd())
-	env.AddGlobalBinding(env.DefineSymbol("OR", true, nil), buildin.CreateBuildinOr())
+	env.AddGlobalBinding(glispNS.DefineSymbol("LIST", true, nil, true), buildin.CreateBuildinList())
+	env.AddGlobalBinding(glispNS.DefineSymbol("CDR", true, nil, true), buildin.CreateBuildinCdr())
+	env.AddGlobalBinding(glispNS.DefineSymbol("CAR", true, nil, true), buildin.CreateBuildinCar())
+	env.AddGlobalBinding(glispNS.DefineSymbol("CONS", true, nil, true), buildin.CreateBuildinCons())
+	env.AddGlobalBinding(glispNS.DefineSymbol("LAMBDA", true, nil, true), buildin.CreateBuildinLambda())
+	env.AddGlobalBinding(glispNS.DefineSymbol("MACRO", true, nil, true), buildin.CreateBuildinMacro())
+	env.AddGlobalBinding(glispNS.DefineSymbol("GENSYM", true, nil, true), buildin.CreateBuildinGensym())
+	env.AddGlobalBinding(glispNS.DefineSymbol("PRINT", true, nil, true), buildin.CreateBuildinPrint())
+	env.AddGlobalBinding(glispNS.DefineSymbol("EXIT", true, nil, true), buildin.CreateBuildinExit())
+	env.AddGlobalBinding(glispNS.DefineSymbol("RETURN", true, nil, true), buildin.CreateBuildinReturn())
+	env.AddGlobalBinding(glispNS.DefineSymbol("LOAD", true, nil, true), buildin.CreateBuildinLoad())
+	env.AddGlobalBinding(glispNS.DefineSymbol("VAR", true, nil, true), buildin.CreateBuildinVar())
+	env.AddGlobalBinding(glispNS.DefineSymbol("=", true, nil, true), buildin.CreateBuildinAssign())
+	env.AddGlobalBinding(glispNS.DefineSymbol("SCOPE", true, nil, true), buildin.CreateBuildinScope())
+	env.AddGlobalBinding(glispNS.DefineSymbol("EVAL", true, nil, true), buildin.CreateBuildinEval())
+	env.AddGlobalBinding(glispNS.DefineSymbol("ELT", true, nil, true), buildin.CreateBuildinElt())
+	env.AddGlobalBinding(glispNS.DefineSymbol("ARRAY", true, nil, true), buildin.CreateBuildinArray())
+	env.AddGlobalBinding(glispNS.DefineSymbol("MAKE-ARRAY", true, nil, true), buildin.CreateBuildinMakeArray())
+	env.AddGlobalBinding(glispNS.DefineSymbol("IF", true, nil, true), buildin.CreateBuildinIf())
+	env.AddGlobalBinding(glispNS.DefineSymbol("PROGN", true, nil, true), buildin.CreateBuildinProgn())
+	env.AddGlobalBinding(glispNS.DefineSymbol("TRY", true, nil, true), buildin.CreateBuildinTry())
+	env.AddGlobalBinding(glispNS.DefineSymbol("THROW", true, nil, true), buildin.CreateBuildinThrow())
+	env.AddGlobalBinding(glispNS.DefineSymbol("DICTIONARY", true, nil, true), buildin.CreateBuildinDictionary())
+	env.AddGlobalBinding(glispNS.DefineSymbol("AND", true, nil, true), buildin.CreateBuildinAnd())
+	env.AddGlobalBinding(glispNS.DefineSymbol("OR", true, nil, true), buildin.CreateBuildinOr())
+	env.AddGlobalBinding(glispNS.DefineSymbol("NAMESPACE", true, nil, true), buildin.CreateBuildinNamespace())
+	env.AddGlobalBinding(glispNS.DefineSymbol("IN-NAMESPACE", true, nil, true), buildin.CreateBuildinInNamespace())
+	env.AddGlobalBinding(glispNS.DefineSymbol("USE-NAMESPACE", true, nil, true), buildin.CreateBuildinUseNamespace())
+
+	// Let glisp-user namespace use the glisp namespace
+	glispUserNS.Use(glispNS)
+
+	// Set current namespace to glisp user
+	env.currentNamespace = glispUserNS
 
 	return env
 }
 
+// FindNamespace find a namespace
+func (env *Environment) FindNamespace(name string) namespace.Namespace {
+	return env.namespaces[name]
+}
+
+// AddNamespace add a namespace
+func (env *Environment) AddNamespace(ns namespace.Namespace) error {
+	ens := env.namespaces[ns.Name()]
+	if ens != nil {
+		return fmt.Errorf("namespace %v already exists", ns.Name())
+	}
+
+	env.namespaces[ns.Name()] = ns
+
+	return nil
+}
+
+// ChangeCurrentNamespace changes the current namespace
+func (env *Environment) ChangeCurrentNamespace(name string) namespace.Namespace {
+	ns := env.namespaces[name]
+	if ns != nil {
+		env.currentNamespace = ns
+		return ns
+	}
+
+	return nil
+}
+
+// CurrentNamespace gets the current namespace
+func (env *Environment) CurrentNamespace() namespace.Namespace {
+	return env.currentNamespace
+}
+
 // Gensym creates a unique uninterned symbol
 func (env *Environment) Gensym() *symbols.Symbol {
-	name := fmt.Sprintf("SYSTEM::G%d", env.gensymCounter)
+	name := fmt.Sprintf("G%d", env.gensymCounter)
 	env.gensymCounter++
 
 	return &symbols.Symbol{
@@ -102,19 +165,19 @@ func (env *Environment) Gensym() *symbols.Symbol {
 }
 
 // CurrentScope returns the current scope
-func (env *Environment) CurrentScope() environment.Scope {
-	return env.scopes.Front().Value.(environment.Scope)
+func (env *Environment) CurrentScope() scope.Scope {
+	return env.scopes.Front().Value.(scope.Scope)
 }
 
 // PopScope pop a scope
-func (env *Environment) PopScope() environment.Scope {
-	return env.scopes.Remove(env.scopes.Front()).(environment.Scope)
+func (env *Environment) PopScope() scope.Scope {
+	return env.scopes.Remove(env.scopes.Front()).(scope.Scope)
 }
 
 // PushScope push a scope, if scope is nil create a new one
-func (env *Environment) PushScope(s environment.Scope) environment.Scope {
+func (env *Environment) PushScope(s scope.Scope) scope.Scope {
 	if s == nil {
-		s = make(environment.Scope)
+		s = make(scope.Scope)
 	}
 
 	env.scopes.PushFront(s)
@@ -124,11 +187,11 @@ func (env *Environment) PushScope(s environment.Scope) environment.Scope {
 
 // CaptureScope captures the scope stack flattened except for the global scope
 // if a symbol is shadowed, only capture the topmost binding
-func (env *Environment) CaptureScope() environment.Scope {
-	s := make(environment.Scope)
+func (env *Environment) CaptureScope() scope.Scope {
+	s := make(scope.Scope)
 
 	for e := env.scopes.Front(); e.Next() != nil; e = e.Next() {
-		otherScope := e.Value.(environment.Scope)
+		otherScope := e.Value.(scope.Scope)
 		for sym, val := range otherScope {
 			if s[sym] == nil {
 				s[sym] = val
@@ -146,7 +209,7 @@ func (env *Environment) AddGlobalBinding(sym *symbols.Symbol, obj types.Object) 
 
 // AddBinding bind object to symbol in the current scope
 func (env *Environment) AddBinding(sym *symbols.Symbol, obj types.Object) {
-	env.scopes.Front().Value.(environment.Scope)[sym] = obj
+	env.scopes.Front().Value.(scope.Scope)[sym] = obj
 }
 
 // GetBinding get binding for symbol
@@ -155,7 +218,7 @@ func (env *Environment) GetBinding(sym *symbols.Symbol) types.Object {
 
 	// Go through scopes to find binding
 	for e := env.scopes.Front(); e != nil; e = e.Next() {
-		s := e.Value.(environment.Scope)
+		s := e.Value.(scope.Scope)
 		obj = s[sym]
 		if obj != nil {
 			break
@@ -169,7 +232,7 @@ func (env *Environment) GetBinding(sym *symbols.Symbol) types.Object {
 func (env *Environment) SetBinding(sym *symbols.Symbol, obj types.Object) error {
 	// Go through scopes to find binding
 	for e := env.scopes.Front(); e != nil; e = e.Next() {
-		s := e.Value.(environment.Scope)
+		s := e.Value.(scope.Scope)
 		_, ok := s[sym]
 		if ok {
 			s[sym] = obj
@@ -180,25 +243,45 @@ func (env *Environment) SetBinding(sym *symbols.Symbol, obj types.Object) error 
 	return fmt.Errorf("unbound symbol %v", sym)
 }
 
-// GetSymbol returns a symbol or nil if not found
-func (env *Environment) GetSymbol(name string) *symbols.Symbol {
-	return env.symTable[name]
+// FindSymbol returns a symbol or nil if not found
+func (env *Environment) FindSymbol(name string) *symbols.Symbol {
+	return env.currentNamespace.FindSymbol(name)
+}
+
+// FindExportedSymbolInNamespace find exported symbol
+func (env *Environment) FindExportedSymbolInNamespace(name string, ns string) *symbols.Symbol {
+	return env.namespaces[ns].FindSymbol(name)
+}
+
+// FindInternedSymbolInNamespace find interned symbol
+func (env *Environment) FindInternedSymbolInNamespace(name string, ns string) *symbols.Symbol {
+	return env.namespaces[ns].FindSymbol(name)
 }
 
 // DefineSymbol adds a new symbol to the environment or returns an
 // existing symbol
 func (env *Environment) DefineSymbol(name string, reserved bool, value types.Object) *symbols.Symbol {
-	sym := env.symTable[name]
+	return env.currentNamespace.DefineSymbol(name, reserved, value, false)
+}
 
-	if sym == nil {
-		sym = &symbols.Symbol{
-			Name:     name,
-			Reserved: reserved,
-			Value:    value,
-		}
+// InternSymbol interns a symbol
+func (env *Environment) InternSymbol(name string) *symbols.Symbol {
+	return env.currentNamespace.Intern(name)
+}
 
-		env.symTable[name] = sym
-	}
+// InternKeyword adds a keyword
+func (env *Environment) InternKeyword(name string) *symbols.Symbol {
+	sym := env.keywordNamespace.Intern(name)
+
+	// Is keyword
+	sym.IsKeyword = true
+
+	// Export the keyword
+	env.keywordNamespace.Export(sym)
+
+	// Add a global reserved binding
+	sym.Reserved = true
+	env.AddGlobalBinding(sym, sym)
 
 	return sym
 }

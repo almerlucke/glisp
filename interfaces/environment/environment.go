@@ -1,22 +1,33 @@
 package environment
 
 import (
+	"github.com/almerlucke/glisp/interfaces/namespace"
+	"github.com/almerlucke/glisp/scope"
 	"github.com/almerlucke/glisp/types"
 	"github.com/almerlucke/glisp/types/symbols"
 )
 
-// Scope holds the bindings of a symbol to an object
-type Scope map[*symbols.Symbol]types.Object
-
 // Environment implements the currently defined symbols and the binding scopes
 type Environment interface {
-	CurrentScope() Scope
+	FindNamespace(name string) namespace.Namespace
 
-	PopScope() Scope
+	AddNamespace(ns namespace.Namespace) error
 
-	PushScope(scope Scope) Scope
+	CurrentNamespace() namespace.Namespace
 
-	CaptureScope() Scope
+	ChangeCurrentNamespace(name string) namespace.Namespace
+
+	FindExportedSymbolInNamespace(name string, ns string) *symbols.Symbol
+
+	FindInternedSymbolInNamespace(name string, ns string) *symbols.Symbol
+
+	CurrentScope() scope.Scope
+
+	PopScope() scope.Scope
+
+	PushScope(scope scope.Scope) scope.Scope
+
+	CaptureScope() scope.Scope
 
 	AddGlobalBinding(sym *symbols.Symbol, obj types.Object)
 
@@ -26,9 +37,13 @@ type Environment interface {
 
 	SetBinding(sym *symbols.Symbol, obj types.Object) error
 
-	GetSymbol(name string) *symbols.Symbol
+	FindSymbol(name string) *symbols.Symbol
 
 	DefineSymbol(name string, reserved bool, value types.Object) *symbols.Symbol
+
+	InternSymbol(name string) *symbols.Symbol
+
+	InternKeyword(name string) *symbols.Symbol
 
 	Gensym() *symbols.Symbol
 

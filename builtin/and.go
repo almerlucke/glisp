@@ -34,7 +34,7 @@ func And(args *cons.Cons, env environment.Environment, context interface{}) (typ
 	return result, nil
 }
 
-// CreateBuildinAnd creates a buildin function object
-func CreateBuildinAnd() *functions.BuildinFunction {
-	return functions.NewBuildinFunction(And, 0, false)
+// CreateBuiltinAnd creates a builtin function object
+func CreateBuiltinAnd() *functions.BuiltinFunction {
+	return functions.NewBuiltinFunction(And, 0, false)
 }

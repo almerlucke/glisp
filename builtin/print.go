@@ -9,7 +9,7 @@ import (
 	"github.com/almerlucke/glisp/types/functions"
 )
 
-// Print buildin function
+// Print builtin function
 func Print(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	if args != nil {
 		args.Iter(func(obj types.Object, index interface{}) (bool, error) {
@@ -21,7 +21,7 @@ func Print(args *cons.Cons, env environment.Environment, context interface{}) (t
 	return types.NIL, nil
 }
 
-// CreateBuildinPrint creates a buildin function object
-func CreateBuildinPrint() *functions.BuildinFunction {
-	return functions.NewBuildinFunction(Print, 0, true)
+// CreateBuiltinPrint creates a builtin function object
+func CreateBuiltinPrint() *functions.BuiltinFunction {
+	return functions.NewBuiltinFunction(Print, 0, true)
 }

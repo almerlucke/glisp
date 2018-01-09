@@ -9,7 +9,7 @@ import (
 	"github.com/almerlucke/glisp/types/functions"
 )
 
-// Cdr buildin function
+// Cdr builtin function
 func Cdr(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	obj := args.Car
 
@@ -24,7 +24,7 @@ func Cdr(args *cons.Cons, env environment.Environment, context interface{}) (typ
 	return nil, errors.New("cdr expects a list as argument")
 }
 
-// CreateBuildinCdr creates a buildin function object
-func CreateBuildinCdr() *functions.BuildinFunction {
-	return functions.NewBuildinFunction(Cdr, 1, true)
+// CreateBuiltinCdr creates a builtin function object
+func CreateBuiltinCdr() *functions.BuiltinFunction {
+	return functions.NewBuiltinFunction(Cdr, 1, true)
 }

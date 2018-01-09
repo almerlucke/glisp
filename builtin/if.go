@@ -28,7 +28,7 @@ func If(args *cons.Cons, env environment.Environment, context interface{}) (type
 	return result, err
 }
 
-// CreateBuildinIf creates a buildin function object
-func CreateBuildinIf() *functions.BuildinFunction {
-	return functions.NewBuildinFunction(If, 2, false)
+// CreateBuiltinIf creates a builtin function object
+func CreateBuiltinIf() *functions.BuiltinFunction {
+	return functions.NewBuiltinFunction(If, 2, false)
 }

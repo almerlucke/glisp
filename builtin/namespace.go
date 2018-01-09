@@ -166,7 +166,7 @@ func Namespace(args *cons.Cons, env environment.Environment, context interface{}
 	return ns, nil
 }
 
-// InNamespace buildin function
+// InNamespace builtin function
 func InNamespace(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	name, err := namespaceGetName(args.Car)
 	if err != nil {
@@ -187,7 +187,7 @@ func InNamespace(args *cons.Cons, env environment.Environment, context interface
 	return ns, nil
 }
 
-// UseNamespace buildin function
+// UseNamespace builtin function
 func UseNamespace(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	name, err := namespaceGetName(args.Car)
 	if err != nil {
@@ -206,17 +206,17 @@ func UseNamespace(args *cons.Cons, env environment.Environment, context interfac
 	return ns, nil
 }
 
-// CreateBuildinNamespace creates a buildin function object
-func CreateBuildinNamespace() *functions.BuildinFunction {
-	return functions.NewBuildinFunction(Namespace, 1, false)
+// CreateBuiltinNamespace creates a builtin function object
+func CreateBuiltinNamespace() *functions.BuiltinFunction {
+	return functions.NewBuiltinFunction(Namespace, 1, false)
 }
 
-// CreateBuildinInNamespace creates a buildin function object
-func CreateBuildinInNamespace() *functions.BuildinFunction {
-	return functions.NewBuildinFunction(InNamespace, 1, false)
+// CreateBuiltinInNamespace creates a builtin function object
+func CreateBuiltinInNamespace() *functions.BuiltinFunction {
+	return functions.NewBuiltinFunction(InNamespace, 1, false)
 }
 
-// CreateBuildinUseNamespace creates a buildin function object
-func CreateBuildinUseNamespace() *functions.BuildinFunction {
-	return functions.NewBuildinFunction(UseNamespace, 1, false)
+// CreateBuiltinUseNamespace creates a builtin function object
+func CreateBuiltinUseNamespace() *functions.BuiltinFunction {
+	return functions.NewBuiltinFunction(UseNamespace, 1, false)
 }

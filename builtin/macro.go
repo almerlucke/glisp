@@ -59,7 +59,7 @@ func Macro(args *cons.Cons, env environment.Environment, context interface{}) (t
 	return functions.NewMacroFunction(symList, env.CaptureScope(), body), nil
 }
 
-// CreateBuildinMacro creates a buildin function object
-func CreateBuildinMacro() *functions.BuildinFunction {
-	return functions.NewBuildinFunction(Macro, 1, false)
+// CreateBuiltinMacro creates a builtin function object
+func CreateBuiltinMacro() *functions.BuiltinFunction {
+	return functions.NewBuiltinFunction(Macro, 1, false)
 }

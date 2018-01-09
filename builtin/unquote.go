@@ -7,12 +7,12 @@ import (
 	"github.com/almerlucke/glisp/types/functions"
 )
 
-// Unquote buildin function
+// Unquote builtin function
 func Unquote(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	return args.Car, nil
 }
 
-// CreateBuildinUnquote creates a buildin function object
-func CreateBuildinUnquote() *functions.BuildinFunction {
-	return functions.NewBuildinFunction(Unquote, 1, true)
+// CreateBuiltinUnquote creates a builtin function object
+func CreateBuiltinUnquote() *functions.BuiltinFunction {
+	return functions.NewBuiltinFunction(Unquote, 1, true)
 }

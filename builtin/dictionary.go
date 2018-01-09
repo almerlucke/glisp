@@ -37,7 +37,7 @@ func Dictionary(args *cons.Cons, env environment.Environment, context interface{
 	return dictionary, nil
 }
 
-// CreateBuildinDictionary creates a buildin function object
-func CreateBuildinDictionary() *functions.BuildinFunction {
-	return functions.NewBuildinFunction(Dictionary, 0, true)
+// CreateBuiltinDictionary creates a builtin function object
+func CreateBuiltinDictionary() *functions.BuiltinFunction {
+	return functions.NewBuiltinFunction(Dictionary, 0, true)
 }

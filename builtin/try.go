@@ -14,7 +14,7 @@ type tryContext struct {
 	Err string
 }
 
-// Try buildin function
+// Try builtin function
 func Try(args *cons.Cons, env environment.Environment, context interface{}) (result types.Object, err error) {
 	tryPart := args.Car
 	catchPart := args.Cdr.(*cons.Cons).Car
@@ -72,12 +72,12 @@ func Throw(args *cons.Cons, env environment.Environment, context interface{}) (t
 	panic(tctx)
 }
 
-// CreateBuildinTry creates a buildin function object
-func CreateBuildinTry() *functions.BuildinFunction {
-	return functions.NewBuildinFunction(Try, 2, false)
+// CreateBuiltinTry creates a builtin function object
+func CreateBuiltinTry() *functions.BuiltinFunction {
+	return functions.NewBuiltinFunction(Try, 2, false)
 }
 
-// CreateBuildinThrow creates a buildin function object
-func CreateBuildinThrow() *functions.BuildinFunction {
-	return functions.NewBuildinFunction(Throw, 1, true)
+// CreateBuiltinThrow creates a builtin function object
+func CreateBuiltinThrow() *functions.BuiltinFunction {
+	return functions.NewBuiltinFunction(Throw, 1, true)
 }

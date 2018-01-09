@@ -7,7 +7,7 @@ import (
 	"github.com/almerlucke/glisp/types/functions"
 )
 
-// Progn buildin function
+// Progn builtin function
 func Progn(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	var result types.Object = types.NIL
 	var err error
@@ -20,7 +20,7 @@ func Progn(args *cons.Cons, env environment.Environment, context interface{}) (t
 	return result, err
 }
 
-// CreateBuildinProgn creates a buildin function object
-func CreateBuildinProgn() *functions.BuildinFunction {
-	return functions.NewBuildinFunction(Progn, 0, false)
+// CreateBuiltinProgn creates a builtin function object
+func CreateBuiltinProgn() *functions.BuiltinFunction {
+	return functions.NewBuiltinFunction(Progn, 0, false)
 }

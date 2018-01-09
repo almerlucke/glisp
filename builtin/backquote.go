@@ -86,7 +86,7 @@ func expansion(obj types.Object, env environment.Environment, context interface{
 	return builder.Head, nil
 }
 
-// Backquote buildin function
+// Backquote builtin function
 func Backquote(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	obj := args.Car
 
@@ -120,7 +120,7 @@ func Backquote(args *cons.Cons, env environment.Environment, context interface{}
 	return expansion(l, env, context)
 }
 
-// CreateBuildinBackquote creates a buildin function object
-func CreateBuildinBackquote() *functions.BuildinFunction {
-	return functions.NewBuildinFunction(Backquote, 1, false)
+// CreateBuiltinBackquote creates a builtin function object
+func CreateBuiltinBackquote() *functions.BuiltinFunction {
+	return functions.NewBuiltinFunction(Backquote, 1, false)
 }

@@ -7,7 +7,7 @@ import (
 	"github.com/almerlucke/glisp/types/functions"
 )
 
-// Or buildin function
+// Or builtin function
 func Or(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	var result types.Object = types.NIL
 
@@ -34,7 +34,7 @@ func Or(args *cons.Cons, env environment.Environment, context interface{}) (type
 	return result, nil
 }
 
-// CreateBuildinOr creates a buildin function object
-func CreateBuildinOr() *functions.BuildinFunction {
-	return functions.NewBuildinFunction(Or, 0, false)
+// CreateBuiltinOr creates a builtin function object
+func CreateBuiltinOr() *functions.BuiltinFunction {
+	return functions.NewBuiltinFunction(Or, 0, false)
 }

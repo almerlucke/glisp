@@ -18,7 +18,7 @@ func Cons(args *cons.Cons, env environment.Environment, context interface{}) (ty
 	}, nil
 }
 
-// CreateBuildinCons creates a buildin function object
-func CreateBuildinCons() *functions.BuildinFunction {
-	return functions.NewBuildinFunction(Cons, 2, true)
+// CreateBuiltinCons creates a builtin function object
+func CreateBuiltinCons() *functions.BuiltinFunction {
+	return functions.NewBuiltinFunction(Cons, 2, true)
 }

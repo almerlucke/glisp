@@ -7,7 +7,7 @@ import (
 	"github.com/almerlucke/glisp/types/functions"
 )
 
-// Not buildin function
+// Not builtin function
 func Not(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	if args.Car == types.NIL {
 		return types.T, nil
@@ -16,7 +16,7 @@ func Not(args *cons.Cons, env environment.Environment, context interface{}) (typ
 	return types.NIL, nil
 }
 
-// CreateBuildinNot creates a buildin function object
-func CreateBuildinNot() *functions.BuildinFunction {
-	return functions.NewBuildinFunction(Not, 1, true)
+// CreateBuiltinNot creates a builtin function object
+func CreateBuiltinNot() *functions.BuiltinFunction {
+	return functions.NewBuiltinFunction(Not, 1, true)
 }

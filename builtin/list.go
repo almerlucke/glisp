@@ -16,7 +16,7 @@ func List(args *cons.Cons, env environment.Environment, context interface{}) (ty
 	return args, nil
 }
 
-// CreateBuildinList creates a buildin function object
-func CreateBuildinList() *functions.BuildinFunction {
-	return functions.NewBuildinFunction(List, 0, true)
+// CreateBuiltinList creates a builtin function object
+func CreateBuiltinList() *functions.BuiltinFunction {
+	return functions.NewBuiltinFunction(List, 0, true)
 }

@@ -11,7 +11,7 @@ import (
 	"github.com/almerlucke/glisp/types/symbols"
 )
 
-// Lambda buildin function
+// Lambda builtin function
 func Lambda(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	argType := args.Car.Type()
 
@@ -59,7 +59,7 @@ func Lambda(args *cons.Cons, env environment.Environment, context interface{}) (
 	return functions.NewLambdaFunction(symList, env.CaptureScope(), body), nil
 }
 
-// CreateBuildinLambda creates a buildin function object
-func CreateBuildinLambda() *functions.BuildinFunction {
-	return functions.NewBuildinFunction(Lambda, 1, false)
+// CreateBuiltinLambda creates a builtin function object
+func CreateBuiltinLambda() *functions.BuiltinFunction {
+	return functions.NewBuiltinFunction(Lambda, 1, false)
 }

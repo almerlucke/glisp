@@ -84,7 +84,7 @@ func expressionAssign(c *cons.Cons, val types.Object, env environment.Environmen
 	return assignable.Assign(args, val, env, context)
 }
 
-// Assign buildin function
+// Assign builtin function
 func Assign(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	switch args.Car.Type() {
 	case types.Symbol:
@@ -96,7 +96,7 @@ func Assign(args *cons.Cons, env environment.Environment, context interface{}) (
 	return nil, fmt.Errorf("can't assign to %v", args.Car)
 }
 
-// CreateBuildinAssign creates a buildin function object
-func CreateBuildinAssign() *functions.BuildinFunction {
-	return functions.NewBuildinFunction(Assign, 2, false)
+// CreateBuiltinAssign creates a builtin function object
+func CreateBuiltinAssign() *functions.BuiltinFunction {
+	return functions.NewBuiltinFunction(Assign, 2, false)
 }

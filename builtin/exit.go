@@ -17,7 +17,7 @@ func Exit(args *cons.Cons, env environment.Environment, context interface{}) (ty
 	return types.NIL, nil
 }
 
-// CreateBuildinExit creates a buildin function object
-func CreateBuildinExit() *functions.BuildinFunction {
-	return functions.NewBuildinFunction(Exit, 0, false)
+// CreateBuiltinExit creates a builtin function object
+func CreateBuiltinExit() *functions.BuiltinFunction {
+	return functions.NewBuiltinFunction(Exit, 0, false)
 }

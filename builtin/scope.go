@@ -30,7 +30,7 @@ func Scope(args *cons.Cons, env environment.Environment, context interface{}) (t
 	return val, nil
 }
 
-// CreateBuildinScope creates a buildin function object
-func CreateBuildinScope() *functions.BuildinFunction {
-	return functions.NewBuildinFunction(Scope, 0, false)
+// CreateBuiltinScope creates a builtin function object
+func CreateBuiltinScope() *functions.BuiltinFunction {
+	return functions.NewBuiltinFunction(Scope, 0, false)
 }

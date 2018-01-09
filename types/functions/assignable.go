@@ -11,14 +11,14 @@ type AssignableFunctionImp func(*cons.Cons, types.Object, environment.Environmen
 
 // AssignableFunction function that implements Assignable
 type AssignableFunction struct {
-	*BuildinFunction
+	*BuiltinFunction
 	assignImp AssignableFunctionImp
 }
 
 // NewAssignableFunction creates a new assignable function
-func NewAssignableFunction(imp BuildinFunctionImp, assignImp AssignableFunctionImp, numArgs int, evalArgs bool) *AssignableFunction {
+func NewAssignableFunction(imp BuiltinFunctionImp, assignImp AssignableFunctionImp, numArgs int, evalArgs bool) *AssignableFunction {
 	return &AssignableFunction{
-		BuildinFunction: NewBuildinFunction(imp, numArgs, evalArgs),
+		BuiltinFunction: NewBuiltinFunction(imp, numArgs, evalArgs),
 		assignImp:       assignImp,
 	}
 }

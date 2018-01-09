@@ -7,12 +7,12 @@ import (
 	"github.com/almerlucke/glisp/types/functions"
 )
 
-// Quote buildin function
+// Quote builtin function
 func Quote(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	return args.Car, nil
 }
 
-// CreateBuildinQuote creates a buildin function object
-func CreateBuildinQuote() *functions.BuildinFunction {
-	return functions.NewBuildinFunction(Quote, 1, false)
+// CreateBuiltinQuote creates a builtin function object
+func CreateBuiltinQuote() *functions.BuiltinFunction {
+	return functions.NewBuiltinFunction(Quote, 1, false)
 }

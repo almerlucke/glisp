@@ -7,12 +7,12 @@ import (
 	"github.com/almerlucke/glisp/types/functions"
 )
 
-// Gensym buildin function
+// Gensym builtin function
 func Gensym(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	return env.Gensym(), nil
 }
 
-// CreateBuildinGensym creates a buildin function object
-func CreateBuildinGensym() *functions.BuildinFunction {
-	return functions.NewBuildinFunction(Gensym, 0, false)
+// CreateBuiltinGensym creates a builtin function object
+func CreateBuiltinGensym() *functions.BuiltinFunction {
+	return functions.NewBuiltinFunction(Gensym, 0, false)
 }

@@ -11,7 +11,7 @@ import (
 	"github.com/almerlucke/glisp/types/numbers"
 )
 
-// Array buildin function creates an array with initial elements
+// Array builtin function creates an array with initial elements
 // or a specific size
 func Array(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	a := make(arrays.Array, args.Length())
@@ -50,12 +50,12 @@ func MakeArray(args *cons.Cons, env environment.Environment, context interface{}
 	return a, nil
 }
 
-// CreateBuildinMakeArray creates an array function object
-func CreateBuildinMakeArray() *functions.BuildinFunction {
-	return functions.NewBuildinFunction(MakeArray, 1, true)
+// CreateBuiltinMakeArray creates an array function object
+func CreateBuiltinMakeArray() *functions.BuiltinFunction {
+	return functions.NewBuiltinFunction(MakeArray, 1, true)
 }
 
-// CreateBuildinArray creates an array function object
-func CreateBuildinArray() *functions.BuildinFunction {
-	return functions.NewBuildinFunction(Array, 1, true)
+// CreateBuiltinArray creates an array function object
+func CreateBuiltinArray() *functions.BuiltinFunction {
+	return functions.NewBuiltinFunction(Array, 1, true)
 }

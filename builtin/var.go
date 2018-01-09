@@ -11,7 +11,7 @@ import (
 	"github.com/almerlucke/glisp/types/symbols"
 )
 
-// Var buildin function
+// Var builtin function
 func Var(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	if args.Car.Type() != types.Symbol {
 		return nil, errors.New("var expected a symbol as first argument")
@@ -39,7 +39,7 @@ func Var(args *cons.Cons, env environment.Environment, context interface{}) (typ
 	return val, nil
 }
 
-// CreateBuildinVar creates a buildin function object
-func CreateBuildinVar() *functions.BuildinFunction {
-	return functions.NewBuildinFunction(Var, 1, false)
+// CreateBuiltinVar creates a builtin function object
+func CreateBuiltinVar() *functions.BuiltinFunction {
+	return functions.NewBuiltinFunction(Var, 1, false)
 }

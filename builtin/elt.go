@@ -10,7 +10,7 @@ import (
 	"github.com/almerlucke/glisp/types/functions"
 )
 
-// Elt buildin function
+// Elt builtin function
 func Elt(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	col, ok := args.Car.(collection.Collection)
 
@@ -46,7 +46,7 @@ func EltAssign(args *cons.Cons, val types.Object, env environment.Environment, c
 	return val, nil
 }
 
-// CreateBuildinElt creates a assignable function object
-func CreateBuildinElt() *functions.AssignableFunction {
+// CreateBuiltinElt creates a assignable function object
+func CreateBuiltinElt() *functions.AssignableFunction {
 	return functions.NewAssignableFunction(Elt, EltAssign, 2, true)
 }

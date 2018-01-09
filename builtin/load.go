@@ -16,7 +16,7 @@ import (
 	"github.com/almerlucke/glisp/types/strings"
 )
 
-// Load buildin function
+// Load builtin function
 func Load(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	if args.Car.Type() != types.String {
 		return nil, errors.New("load expected a path string as first argument")
@@ -59,7 +59,7 @@ func Load(args *cons.Cons, env environment.Environment, context interface{}) (ty
 	return types.NIL, nil
 }
 
-// CreateBuildinLoad creates a buildin function object
-func CreateBuildinLoad() *functions.BuildinFunction {
-	return functions.NewBuildinFunction(Load, 0, true)
+// CreateBuiltinLoad creates a builtin function object
+func CreateBuiltinLoad() *functions.BuiltinFunction {
+	return functions.NewBuiltinFunction(Load, 0, true)
 }

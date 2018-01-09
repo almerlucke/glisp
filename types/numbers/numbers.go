@@ -2,15 +2,71 @@ package numbers
 
 import (
 	"fmt"
+	"math"
 	"reflect"
 
 	"github.com/almerlucke/glisp/types"
 )
 
+// Numeric type
+type Numeric interface {
+	isNumeric()
+}
+
+// Int8 is int8
+type Int8 int8
+
+func (i Int8) isNumeric() {}
+
+// Int16 is int16
+type Int16 int16
+
+func (i Int16) isNumeric() {}
+
+// Int32 is int32
+type Int32 int32
+
+func (i Int32) isNumeric() {}
+
+// Int64 is int64
+type Int64 int64
+
+func (i Int64) isNumeric() {}
+
+// Uint8 is uint8
+type Uint8 uint8
+
+func (i Uint8) isNumeric() {}
+
+// Uint16 is uint16
+type Uint16 uint16
+
+func (i Uint16) isNumeric() {}
+
+// Uint32 is uint32
+type Uint32 uint32
+
+func (i Uint32) isNumeric() {}
+
+// Uint64 is uint64
+type Uint64 uint64
+
+func (i Uint64) isNumeric() {}
+
+// Float32 is float32
+type Float32 float32
+
+func (i Float32) isNumeric() {}
+
+// Float64 is float64
+type Float64 float64
+
+func (i Float64) isNumeric() {}
+
 // Number type
 type Number struct {
 	Kind  reflect.Kind
-	Value interface{}
+	Value Numeric
 }
 
 // Type Number for Object interface
@@ -23,74 +79,6 @@ func (num *Number) String() string {
 	return fmt.Sprintf("%v", num.Value)
 }
 
-// Uint64Value returns the uint64 representation
-func (num *Number) Uint64Value() uint64 {
-	var val = uint64(0)
-
-	switch num.Kind {
-	case reflect.Float32:
-		val = uint64(num.Value.(float32))
-	case reflect.Float64:
-		val = uint64(num.Value.(float64))
-	case reflect.Int:
-		val = uint64(num.Value.(int))
-	case reflect.Int8:
-		val = uint64(num.Value.(int8))
-	case reflect.Int16:
-		val = uint64(num.Value.(int16))
-	case reflect.Int32:
-		val = uint64(num.Value.(int32))
-	case reflect.Int64:
-		val = uint64(num.Value.(int64))
-	case reflect.Uint:
-		val = uint64(num.Value.(uint))
-	case reflect.Uint8:
-		val = uint64(num.Value.(uint8))
-	case reflect.Uint16:
-		val = uint64(num.Value.(uint16))
-	case reflect.Uint32:
-		val = uint64(num.Value.(uint32))
-	case reflect.Uint64:
-		val = num.Value.(uint64)
-	}
-
-	return val
-}
-
-// Int64Value returns the int64 representation
-func (num *Number) Int64Value() int64 {
-	var val = int64(0)
-
-	switch num.Kind {
-	case reflect.Float32:
-		val = int64(num.Value.(float32))
-	case reflect.Float64:
-		val = int64(num.Value.(float64))
-	case reflect.Int:
-		val = int64(num.Value.(int))
-	case reflect.Int8:
-		val = int64(num.Value.(int8))
-	case reflect.Int16:
-		val = int64(num.Value.(int16))
-	case reflect.Int32:
-		val = int64(num.Value.(int32))
-	case reflect.Int64:
-		val = num.Value.(int64)
-	case reflect.Uint:
-		val = int64(num.Value.(uint))
-	case reflect.Uint8:
-		val = int64(num.Value.(uint8))
-	case reflect.Uint16:
-		val = int64(num.Value.(uint16))
-	case reflect.Uint32:
-		val = int64(num.Value.(uint32))
-	case reflect.Uint64:
-		val = int64(num.Value.(uint64))
-	}
-
-	return val
-}
-
 // Compare for comparable interface
 func (num *Number) Compare(obj types.Comparable) bool {
 	otherNum, ok := obj.(*Number)
@@ -100,4 +88,168 @@ func (num *Number) Compare(obj types.Comparable) bool {
 	}
 
 	return num.Value == otherNum.Value
+}
+
+// New number
+func New(kind reflect.Kind) *Number {
+	num := &Number{
+		Kind: kind,
+	}
+
+	switch kind {
+	case reflect.Int8:
+		num.Value = Int8(0)
+	case reflect.Int16:
+		num.Value = Int16(0)
+	case reflect.Int32:
+		num.Value = Int32(0)
+	case reflect.Int64:
+		num.Value = Int64(0)
+	case reflect.Uint8:
+		num.Value = Uint8(0)
+	case reflect.Uint16:
+		num.Value = Uint16(0)
+	case reflect.Uint32:
+		num.Value = Uint32(0)
+	case reflect.Uint64:
+		num.Value = Uint64(0)
+	case reflect.Float32:
+		num.Value = Float32(0)
+	case reflect.Float64:
+		num.Value = Float64(0)
+	}
+
+	return num
+}
+
+// SetInt64Value set value with int64
+func (num *Number) SetInt64Value(val int64) {
+	switch num.Kind {
+	case reflect.Int8:
+		num.Value = Int8(val)
+	case reflect.Int16:
+		num.Value = Int16(val)
+	case reflect.Int32:
+		num.Value = Int32(val)
+	case reflect.Int64:
+		num.Value = Int64(val)
+	case reflect.Uint8:
+		num.Value = Uint8(val)
+	case reflect.Uint16:
+		num.Value = Uint16(val)
+	case reflect.Uint32:
+		num.Value = Uint32(val)
+	case reflect.Uint64:
+		num.Value = Uint64(val)
+	case reflect.Float32:
+		num.Value = Float32(val)
+	case reflect.Float64:
+		num.Value = Float64(val)
+	}
+}
+
+// SetUint64Value set value with uint64
+func (num *Number) SetUint64Value(val uint64) {
+	switch num.Kind {
+	case reflect.Int8:
+		num.Value = Int8(val)
+	case reflect.Int16:
+		num.Value = Int16(val)
+	case reflect.Int32:
+		num.Value = Int32(val)
+	case reflect.Int64:
+		num.Value = Int64(val)
+	case reflect.Uint8:
+		num.Value = Uint8(val)
+	case reflect.Uint16:
+		num.Value = Uint16(val)
+	case reflect.Uint32:
+		num.Value = Uint32(val)
+	case reflect.Uint64:
+		num.Value = Uint64(val)
+	case reflect.Float32:
+		num.Value = Float32(val)
+	case reflect.Float64:
+		num.Value = Float64(val)
+	}
+}
+
+// SetFloat64Value set value with float64
+func (num *Number) SetFloat64Value(val float64) {
+	switch num.Kind {
+	case reflect.Int8:
+		num.Value = Int8(val)
+	case reflect.Int16:
+		num.Value = Int16(val)
+	case reflect.Int32:
+		num.Value = Int32(val)
+	case reflect.Int64:
+		num.Value = Int64(val)
+	case reflect.Uint8:
+		num.Value = Uint8(val)
+	case reflect.Uint16:
+		num.Value = Uint16(val)
+	case reflect.Uint32:
+		num.Value = Uint32(val)
+	case reflect.Uint64:
+		num.Value = Uint64(val)
+	case reflect.Float32:
+		num.Value = Float32(val)
+	case reflect.Float64:
+		num.Value = Float64(val)
+	}
+}
+
+// IsZero check if num is zero
+func (num *Number) IsZero() bool {
+	switch num.Kind {
+	case reflect.Int8:
+		return num.Value.(Int8) == 0
+	case reflect.Int16:
+		return num.Value.(Int16) == 0
+	case reflect.Int32:
+		return num.Value.(Int32) == 0
+	case reflect.Int64:
+		return num.Value.(Int64) == 0
+	case reflect.Uint8:
+		return num.Value.(Uint8) == 0
+	case reflect.Uint16:
+		return num.Value.(Uint16) == 0
+	case reflect.Uint32:
+		return num.Value.(Uint32) == 0
+	case reflect.Uint64:
+		return num.Value.(Uint64) == 0
+	case reflect.Float32:
+		return num.Value.(Float32) == 0
+	case reflect.Float64:
+		return num.Value.(Float64) == 0
+	}
+
+	return false
+}
+
+// IsNaN is number a NaN
+func (num *Number) IsNaN() bool {
+	switch num.Kind {
+	case reflect.Float32:
+		return math.IsNaN(float64(num.Value.(Float32)))
+	case reflect.Float64:
+		return math.IsNaN(float64(num.Value.(Float64)))
+	}
+
+	return false
+}
+
+// IsInteger returns true if num is integer
+func (num *Number) IsInteger() bool {
+	isInteger := true
+
+	switch num.Kind {
+	case reflect.Float32:
+		fallthrough
+	case reflect.Float64:
+		isInteger = false
+	}
+
+	return isInteger
 }

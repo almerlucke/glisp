@@ -8,6 +8,7 @@ import (
 	globals "github.com/almerlucke/glisp/globals/symbols"
 
 	"github.com/almerlucke/glisp/builtin"
+	"github.com/almerlucke/glisp/builtin/numbers"
 	"github.com/almerlucke/glisp/interfaces/function"
 	"github.com/almerlucke/glisp/interfaces/namespace"
 	"github.com/almerlucke/glisp/scope"
@@ -112,6 +113,23 @@ func New() *Environment {
 	env.AddGlobalBinding(glispNS.DefineSymbol("NAMESPACE", true, nil, true), builtin.CreateBuiltinNamespace())
 	env.AddGlobalBinding(glispNS.DefineSymbol("IN-NAMESPACE", true, nil, true), builtin.CreateBuiltinInNamespace())
 	env.AddGlobalBinding(glispNS.DefineSymbol("USE-NAMESPACE", true, nil, true), builtin.CreateBuiltinUseNamespace())
+
+	env.AddGlobalBinding(glispNS.DefineSymbol("INT8", true, nil, true), numbers.CreateBuiltinInt8())
+	env.AddGlobalBinding(glispNS.DefineSymbol("INT16", true, nil, true), numbers.CreateBuiltinInt16())
+	env.AddGlobalBinding(glispNS.DefineSymbol("INT32", true, nil, true), numbers.CreateBuiltinInt32())
+	env.AddGlobalBinding(glispNS.DefineSymbol("INT64", true, nil, true), numbers.CreateBuiltinInt64())
+	env.AddGlobalBinding(glispNS.DefineSymbol("UINT8", true, nil, true), numbers.CreateBuiltinUint8())
+	env.AddGlobalBinding(glispNS.DefineSymbol("UINT16", true, nil, true), numbers.CreateBuiltinUint16())
+	env.AddGlobalBinding(glispNS.DefineSymbol("UINT32", true, nil, true), numbers.CreateBuiltinUint32())
+	env.AddGlobalBinding(glispNS.DefineSymbol("UINT64", true, nil, true), numbers.CreateBuiltinUint64())
+	env.AddGlobalBinding(glispNS.DefineSymbol("FLOAT32", true, nil, true), numbers.CreateBuiltinFloat32())
+	env.AddGlobalBinding(glispNS.DefineSymbol("FLOAT64", true, nil, true), numbers.CreateBuiltinFloat64())
+
+	env.AddGlobalBinding(glispNS.DefineSymbol("+", true, nil, true), numbers.CreateBuiltinNumberAdd())
+	env.AddGlobalBinding(glispNS.DefineSymbol("-", true, nil, true), numbers.CreateBuiltinNumberSubtract())
+	env.AddGlobalBinding(glispNS.DefineSymbol("*", true, nil, true), numbers.CreateBuiltinNumberMultiply())
+	env.AddGlobalBinding(glispNS.DefineSymbol("/", true, nil, true), numbers.CreateBuiltinNumberDivide())
+	env.AddGlobalBinding(glispNS.DefineSymbol("%", true, nil, true), numbers.CreateBuiltinNumberModulo())
 
 	// Let glisp-user namespace use the glisp namespace
 	glispUserNS.Use(glispNS)

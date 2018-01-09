@@ -185,7 +185,7 @@ func (rd *Reader) tokenToObject(token string) (types.Object, error) {
 
 		return &numbers.Number{
 			Kind:  reflect.Int64,
-			Value: i,
+			Value: numbers.Int64(i),
 		}, nil
 	} else if utils.IsFloat(token) {
 		f, err := strconv.ParseFloat(token, 64)
@@ -195,7 +195,7 @@ func (rd *Reader) tokenToObject(token string) (types.Object, error) {
 
 		return &numbers.Number{
 			Kind:  reflect.Float64,
-			Value: f,
+			Value: numbers.Float64(f),
 		}, nil
 	}
 

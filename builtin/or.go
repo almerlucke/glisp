@@ -1,4 +1,4 @@
-package buildin
+package builtin
 
 import (
 	"github.com/almerlucke/glisp/interfaces/environment"

@@ -1,11 +1,11 @@
-package buildin
+package builtin
 
 import (
 	"errors"
 
 	"github.com/almerlucke/glisp/interfaces/environment"
 	"github.com/almerlucke/glisp/types"
-	"github.com/almerlucke/glisp/types/array"
+	"github.com/almerlucke/glisp/types/arrays"
 	"github.com/almerlucke/glisp/types/cons"
 	"github.com/almerlucke/glisp/types/functions"
 	"github.com/almerlucke/glisp/types/numbers"
@@ -14,7 +14,7 @@ import (
 // Array buildin function creates an array with initial elements
 // or a specific size
 func Array(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
-	a := make(array.Array, args.Length())
+	a := make(arrays.Array, args.Length())
 
 	_ = args.Iter(func(obj types.Object, index interface{}) (bool, error) {
 		a[index.(uint64)] = obj
@@ -42,7 +42,7 @@ func MakeArray(args *cons.Cons, env environment.Environment, context interface{}
 		return nil, errors.New("make-array expected a positive number as first argument")
 	}
 
-	a := make(array.Array, ln)
+	a := make(arrays.Array, ln)
 	for i := range a {
 		a[i] = initialObject
 	}

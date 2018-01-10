@@ -25,7 +25,7 @@ func expansion(obj types.Object, env environment.Environment, context interface{
 			if l.Car == symbols.UnquoteSymbol {
 				// Unquote arg
 				if l.Cdr.Type() != types.Cons {
-					return false, errors.New("unquote needs one argument")
+					return false, errors.New("UNQUOTE needs one argument")
 				}
 
 				result, err := env.Eval(l.Cdr.(*cons.Cons).Car, context)
@@ -37,7 +37,7 @@ func expansion(obj types.Object, env environment.Environment, context interface{
 			} else if l.Car == symbols.SpliceSymbol {
 				// Splice arg
 				if l.Cdr.Type() != types.Cons {
-					return false, errors.New("splice needs one argument")
+					return false, errors.New("SPLICE needs one argument")
 				}
 
 				result, err := env.Eval(l.Cdr.(*cons.Cons).Car, context)
@@ -46,14 +46,14 @@ func expansion(obj types.Object, env environment.Environment, context interface{
 				}
 
 				if result.Type() != types.Cons {
-					return false, errors.New("splice result must be a list")
+					return false, errors.New("SPLICE result must be a list")
 				}
 
 				builder.Append(result.(*cons.Cons))
 			} else if l.Car == symbols.BackquoteSymbol {
 				// Recursively call backquote
 				if l.Cdr.Type() != types.Cons {
-					return false, errors.New("backquote needs one argument")
+					return false, errors.New("BACKQUOTE needs one argument")
 				}
 
 				result, err := Backquote(l.Cdr.(*cons.Cons), env, context)
@@ -101,17 +101,17 @@ func Backquote(args *cons.Cons, env environment.Environment, context interface{}
 	if l.Car == symbols.UnquoteSymbol {
 		// Unquote arg
 		if l.Cdr.Type() != types.Cons {
-			return nil, errors.New("unquote needs one argument")
+			return nil, errors.New("UNQUOTE needs one argument")
 		}
 
 		return env.Eval(l.Cdr.(*cons.Cons).Car, context)
 	} else if l.Car == symbols.SpliceSymbol {
 		// Splice arg outside list context is an error
-		return nil, errors.New("splice can only be evaluated in a list context")
+		return nil, errors.New("SPLICE can only be evaluated in a list context")
 	} else if l.Car == symbols.BackquoteSymbol {
 		// Recursively call backquote
 		if l.Cdr.Type() != types.Cons {
-			return nil, errors.New("backquote needs one argument")
+			return nil, errors.New("BACKQUOTE needs one argument")
 		}
 
 		return Backquote(l.Cdr.(*cons.Cons), env, context)

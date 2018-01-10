@@ -14,7 +14,7 @@ import (
 // Var builtin function
 func Var(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	if args.Car.Type() != types.Symbol {
-		return nil, errors.New("var expected a symbol as first argument")
+		return nil, errors.New("VAR expected a symbol as first argument")
 	}
 
 	sym := args.Car.(*symbols.Symbol)

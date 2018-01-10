@@ -14,7 +14,7 @@ import (
 func Int8(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	num, ok := args.Car.(*numbers.Number)
 	if !ok {
-		return nil, errors.New("int8 expected a number as first argument")
+		return nil, errors.New("INT8 expected a number as first argument")
 	}
 
 	return num.Int8(), nil
@@ -29,7 +29,7 @@ func CreateBuiltinInt8() *functions.BuiltinFunction {
 func Int16(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	num, ok := args.Car.(*numbers.Number)
 	if !ok {
-		return nil, errors.New("int16 expected a number as first argument")
+		return nil, errors.New("INT16 expected a number as first argument")
 	}
 
 	return num.Int16(), nil
@@ -44,7 +44,7 @@ func CreateBuiltinInt16() *functions.BuiltinFunction {
 func Int32(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	num, ok := args.Car.(*numbers.Number)
 	if !ok {
-		return nil, errors.New("int32 expected a number as first argument")
+		return nil, errors.New("INT32 expected a number as first argument")
 	}
 
 	return num.Int32(), nil
@@ -59,7 +59,7 @@ func CreateBuiltinInt32() *functions.BuiltinFunction {
 func Int64(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	num, ok := args.Car.(*numbers.Number)
 	if !ok {
-		return nil, errors.New("int64 expected a number as first argument")
+		return nil, errors.New("INT64 expected a number as first argument")
 	}
 
 	return num.Int64(), nil
@@ -74,7 +74,7 @@ func CreateBuiltinInt64() *functions.BuiltinFunction {
 func Uint8(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	num, ok := args.Car.(*numbers.Number)
 	if !ok {
-		return nil, errors.New("uint8 expected a number as first argument")
+		return nil, errors.New("UINT8 expected a number as first argument")
 	}
 
 	return num.Uint8(), nil
@@ -89,7 +89,7 @@ func CreateBuiltinUint8() *functions.BuiltinFunction {
 func Uint16(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	num, ok := args.Car.(*numbers.Number)
 	if !ok {
-		return nil, errors.New("uint16 expected a number as first argument")
+		return nil, errors.New("UINT16 expected a number as first argument")
 	}
 
 	return num.Uint16(), nil
@@ -104,7 +104,7 @@ func CreateBuiltinUint16() *functions.BuiltinFunction {
 func Uint32(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	num, ok := args.Car.(*numbers.Number)
 	if !ok {
-		return nil, errors.New("uint32 expected a number as first argument")
+		return nil, errors.New("UINT32 expected a number as first argument")
 	}
 
 	return num.Uint32(), nil
@@ -119,7 +119,7 @@ func CreateBuiltinUint32() *functions.BuiltinFunction {
 func Uint64(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	num, ok := args.Car.(*numbers.Number)
 	if !ok {
-		return nil, errors.New("uint64 expected a number as first argument")
+		return nil, errors.New("UINT64 expected a number as first argument")
 	}
 
 	return num.Uint64(), nil
@@ -134,7 +134,7 @@ func CreateBuiltinUint64() *functions.BuiltinFunction {
 func Float32(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	num, ok := args.Car.(*numbers.Number)
 	if !ok {
-		return nil, errors.New("float32 expected a number as first argument")
+		return nil, errors.New("FLOAT32 expected a number as first argument")
 	}
 
 	return num.Float32(), nil
@@ -149,7 +149,7 @@ func CreateBuiltinFloat32() *functions.BuiltinFunction {
 func Float64(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	num, ok := args.Car.(*numbers.Number)
 	if !ok {
-		return nil, errors.New("float64 expected a number as first argument")
+		return nil, errors.New("FLOAT64 expected a number as first argument")
 	}
 
 	return num.Float64(), nil

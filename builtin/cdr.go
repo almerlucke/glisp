@@ -21,7 +21,7 @@ func Cdr(args *cons.Cons, env environment.Environment, context interface{}) (typ
 		return obj.(*cons.Cons).Cdr, nil
 	}
 
-	return nil, errors.New("cdr expects a list as argument")
+	return nil, errors.New("CDR expects a list as argument")
 }
 
 // CreateBuiltinCdr creates a builtin function object

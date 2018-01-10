@@ -238,3 +238,111 @@ func (num *Number) Modulo(otherNum *Number) (newNum *Number, err error) {
 
 	return newNum, nil
 }
+
+// Max of two numbers
+func (num *Number) Max(otherNum *Number) (*Number, error) {
+	if num.Kind != otherNum.Kind {
+		return nil, fmt.Errorf("can't MAX %v with %v number", num.Kind, otherNum.Kind)
+	}
+
+	max := num
+
+	switch num.Value.(type) {
+	case Int8:
+		if num.Value.(Int8) < otherNum.Value.(Int8) {
+			max = otherNum
+		}
+	case Int16:
+		if num.Value.(Int16) < otherNum.Value.(Int16) {
+			max = otherNum
+		}
+	case Int32:
+		if num.Value.(Int32) < otherNum.Value.(Int32) {
+			max = otherNum
+		}
+	case Int64:
+		if num.Value.(Int64) < otherNum.Value.(Int64) {
+			max = otherNum
+		}
+	case Uint8:
+		if num.Value.(Uint8) < otherNum.Value.(Uint8) {
+			max = otherNum
+		}
+	case Uint16:
+		if num.Value.(Uint16) < otherNum.Value.(Uint16) {
+			max = otherNum
+		}
+	case Uint32:
+		if num.Value.(Uint32) < otherNum.Value.(Uint32) {
+			max = otherNum
+		}
+	case Uint64:
+		if num.Value.(Uint64) < otherNum.Value.(Uint64) {
+			max = otherNum
+		}
+	case Float32:
+		if num.Value.(Float32) < otherNum.Value.(Float32) {
+			max = otherNum
+		}
+	case Float64:
+		if num.Value.(Float64) < otherNum.Value.(Float64) {
+			max = otherNum
+		}
+	}
+
+	return max, nil
+}
+
+// Min of two numbers
+func (num *Number) Min(otherNum *Number) (*Number, error) {
+	if num.Kind != otherNum.Kind {
+		return nil, fmt.Errorf("can't MIN %v with %v number", num.Kind, otherNum.Kind)
+	}
+
+	min := num
+
+	switch num.Value.(type) {
+	case Int8:
+		if num.Value.(Int8) > otherNum.Value.(Int8) {
+			min = otherNum
+		}
+	case Int16:
+		if num.Value.(Int16) > otherNum.Value.(Int16) {
+			min = otherNum
+		}
+	case Int32:
+		if num.Value.(Int32) > otherNum.Value.(Int32) {
+			min = otherNum
+		}
+	case Int64:
+		if num.Value.(Int64) > otherNum.Value.(Int64) {
+			min = otherNum
+		}
+	case Uint8:
+		if num.Value.(Uint8) > otherNum.Value.(Uint8) {
+			min = otherNum
+		}
+	case Uint16:
+		if num.Value.(Uint16) > otherNum.Value.(Uint16) {
+			min = otherNum
+		}
+	case Uint32:
+		if num.Value.(Uint32) > otherNum.Value.(Uint32) {
+			min = otherNum
+		}
+	case Uint64:
+		if num.Value.(Uint64) > otherNum.Value.(Uint64) {
+			min = otherNum
+		}
+	case Float32:
+		if num.Value.(Float32) > otherNum.Value.(Float32) {
+			min = otherNum
+		}
+	case Float64:
+		if num.Value.(Float64) > otherNum.Value.(Float64) {
+			min = otherNum
+		}
+	}
+
+	return min, nil
+}

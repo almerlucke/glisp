@@ -15,7 +15,7 @@ func Elt(args *cons.Cons, env environment.Environment, context interface{}) (typ
 	col, ok := args.Car.(collection.Collection)
 
 	if !ok {
-		return nil, errors.New("elt expected a collection as first argument")
+		return nil, errors.New("ELT expected a collection as first argument")
 	}
 
 	index := args.Cdr.(*cons.Cons).Car
@@ -33,7 +33,7 @@ func EltAssign(args *cons.Cons, val types.Object, env environment.Environment, c
 	col, ok := args.Car.(collection.Collection)
 
 	if !ok {
-		return nil, errors.New("elt expected a collection as first argument")
+		return nil, errors.New("ELT expected a collection as first argument")
 	}
 
 	index := args.Cdr.(*cons.Cons).Car

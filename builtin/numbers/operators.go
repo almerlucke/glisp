@@ -18,7 +18,7 @@ func NumberAdd(args *cons.Cons, env environment.Environment, context interface{}
 	err = args.Iter(func(obj types.Object, index interface{}) (bool, error) {
 		num, ok := obj.(*numbers.Number)
 		if !ok {
-			return false, errors.New("+ accepts only numbers")
+			return false, errors.New("+ only accepts numbers")
 		}
 
 		if total == nil {
@@ -40,11 +40,6 @@ func NumberAdd(args *cons.Cons, env environment.Environment, context interface{}
 	return total, nil
 }
 
-// CreateBuiltinNumberAdd creates a function object
-func CreateBuiltinNumberAdd() *functions.BuiltinFunction {
-	return functions.NewBuiltinFunction(NumberAdd, 1, true)
-}
-
 // NumberSubtract adds 1 or more numbers
 func NumberSubtract(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	var total *numbers.Number
@@ -53,7 +48,7 @@ func NumberSubtract(args *cons.Cons, env environment.Environment, context interf
 	if args.Length() == 1 {
 		num, ok := args.Car.(*numbers.Number)
 		if !ok {
-			return nil, errors.New("- accepts only numbers")
+			return nil, errors.New("- only accepts numbers")
 		}
 
 		return numbers.New(num.Kind).Subtract(num)
@@ -62,7 +57,7 @@ func NumberSubtract(args *cons.Cons, env environment.Environment, context interf
 	err = args.Iter(func(obj types.Object, index interface{}) (bool, error) {
 		num, ok := obj.(*numbers.Number)
 		if !ok {
-			return false, errors.New("- accepts only numbers")
+			return false, errors.New("- only accepts numbers")
 		}
 
 		if total == nil {
@@ -84,11 +79,6 @@ func NumberSubtract(args *cons.Cons, env environment.Environment, context interf
 	return total, nil
 }
 
-// CreateBuiltinNumberSubtract creates a function object
-func CreateBuiltinNumberSubtract() *functions.BuiltinFunction {
-	return functions.NewBuiltinFunction(NumberSubtract, 1, true)
-}
-
 // NumberMultiply multiply 1 or more numbers
 func NumberMultiply(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	var total *numbers.Number
@@ -97,7 +87,7 @@ func NumberMultiply(args *cons.Cons, env environment.Environment, context interf
 	err = args.Iter(func(obj types.Object, index interface{}) (bool, error) {
 		num, ok := obj.(*numbers.Number)
 		if !ok {
-			return false, errors.New("* accepts only numbers")
+			return false, errors.New("* only accepts numbers")
 		}
 
 		if total == nil {
@@ -119,11 +109,6 @@ func NumberMultiply(args *cons.Cons, env environment.Environment, context interf
 	return total, nil
 }
 
-// CreateBuiltinNumberMultiply creates a function object
-func CreateBuiltinNumberMultiply() *functions.BuiltinFunction {
-	return functions.NewBuiltinFunction(NumberMultiply, 1, true)
-}
-
 // NumberDivide divide 1 or more numbers
 func NumberDivide(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	var total *numbers.Number
@@ -132,7 +117,7 @@ func NumberDivide(args *cons.Cons, env environment.Environment, context interfac
 	if args.Length() == 1 {
 		num, ok := args.Car.(*numbers.Number)
 		if !ok {
-			return nil, errors.New("- accepts only numbers")
+			return nil, errors.New("- only accepts numbers")
 		}
 
 		otherNum := numbers.New(num.Kind)
@@ -144,7 +129,7 @@ func NumberDivide(args *cons.Cons, env environment.Environment, context interfac
 	err = args.Iter(func(obj types.Object, index interface{}) (bool, error) {
 		num, ok := obj.(*numbers.Number)
 		if !ok {
-			return false, errors.New("/ accepts only numbers")
+			return false, errors.New("/ only accepts numbers")
 		}
 
 		if total == nil {
@@ -166,27 +151,112 @@ func NumberDivide(args *cons.Cons, env environment.Environment, context interfac
 	return total, nil
 }
 
-// CreateBuiltinNumberDivide creates a function object
-func CreateBuiltinNumberDivide() *functions.BuiltinFunction {
-	return functions.NewBuiltinFunction(NumberDivide, 1, true)
-}
-
 // NumberModulo modulo 2 numbers
 func NumberModulo(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	num1, ok := args.Car.(*numbers.Number)
 	if !ok {
-		return nil, errors.New("% accepts only numbers")
+		return nil, errors.New("% only accepts numbers")
 	}
 
 	num2, ok := args.Cdr.(*cons.Cons).Car.(*numbers.Number)
 	if !ok {
-		return nil, errors.New("% accepts only numbers")
+		return nil, errors.New("% only accepts numbers")
 	}
 
 	return num1.Modulo(num2)
 }
 
+// NumberMax get max of 1 or more numbers
+func NumberMax(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
+	var max *numbers.Number
+	var err error
+
+	err = args.Iter(func(obj types.Object, index interface{}) (bool, error) {
+		num, ok := obj.(*numbers.Number)
+		if !ok {
+			return false, errors.New("MAX only accepts numbers")
+		}
+
+		if max == nil {
+			max = num
+		} else {
+			max, err = max.Max(num)
+			if err != nil {
+				return false, err
+			}
+		}
+
+		return false, nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return max, nil
+}
+
+// NumberMin get min of 1 or more numbers
+func NumberMin(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
+	var min *numbers.Number
+	var err error
+
+	err = args.Iter(func(obj types.Object, index interface{}) (bool, error) {
+		num, ok := obj.(*numbers.Number)
+		if !ok {
+			return false, errors.New("MIN only accepts numbers")
+		}
+
+		if min == nil {
+			min = num
+		} else {
+			min, err = min.Min(num)
+			if err != nil {
+				return false, err
+			}
+		}
+
+		return false, nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return min, nil
+}
+
+// CreateBuiltinNumberAdd creates a function object
+func CreateBuiltinNumberAdd() *functions.BuiltinFunction {
+	return functions.NewBuiltinFunction(NumberAdd, 1, true)
+}
+
+// CreateBuiltinNumberSubtract creates a function object
+func CreateBuiltinNumberSubtract() *functions.BuiltinFunction {
+	return functions.NewBuiltinFunction(NumberSubtract, 1, true)
+}
+
+// CreateBuiltinNumberMultiply creates a function object
+func CreateBuiltinNumberMultiply() *functions.BuiltinFunction {
+	return functions.NewBuiltinFunction(NumberMultiply, 1, true)
+}
+
+// CreateBuiltinNumberDivide creates a function object
+func CreateBuiltinNumberDivide() *functions.BuiltinFunction {
+	return functions.NewBuiltinFunction(NumberDivide, 1, true)
+}
+
 // CreateBuiltinNumberModulo creates a function object
 func CreateBuiltinNumberModulo() *functions.BuiltinFunction {
 	return functions.NewBuiltinFunction(NumberModulo, 2, true)
+}
+
+// CreateBuiltinNumberMax creates a function object
+func CreateBuiltinNumberMax() *functions.BuiltinFunction {
+	return functions.NewBuiltinFunction(NumberMax, 1, true)
+}
+
+// CreateBuiltinNumberMin creates a function object
+func CreateBuiltinNumberMin() *functions.BuiltinFunction {
+	return functions.NewBuiltinFunction(NumberMin, 1, true)
 }

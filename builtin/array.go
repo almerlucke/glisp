@@ -34,12 +34,12 @@ func MakeArray(args *cons.Cons, env environment.Environment, context interface{}
 	}
 
 	if n.Type() != types.Number {
-		return nil, errors.New("make-array expected a number as first argument")
+		return nil, errors.New("MAKE-ARRAY expected a number as first argument")
 	}
 
 	ln := n.(*numbers.Number).Int64Value()
 	if ln < 0 {
-		return nil, errors.New("make-array expected a positive number as first argument")
+		return nil, errors.New("MAKE-ARRAY expected a positive number as first argument")
 	}
 
 	a := make(arrays.Array, ln)

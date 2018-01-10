@@ -5,10 +5,8 @@ import (
 	"errors"
 	"fmt"
 
-	globals "github.com/almerlucke/glisp/globals/symbols"
+	namespacesSetup "github.com/almerlucke/glisp/environment/namespaces"
 
-	"github.com/almerlucke/glisp/builtin"
-	"github.com/almerlucke/glisp/builtin/numbers"
 	"github.com/almerlucke/glisp/interfaces/function"
 	"github.com/almerlucke/glisp/interfaces/namespace"
 	"github.com/almerlucke/glisp/scope"
@@ -52,84 +50,25 @@ func New() *Environment {
 	scopes := list.New()
 	scopes.PushFront(globalScope)
 
-	glispNS := namespaces.NewNamespace("GLISP", false)
-	keywordNS := namespaces.NewNamespace("KEYWORD", false)
-	glispUserNS := namespaces.NewNamespace("GLISP-USER", true)
-
 	env := &Environment{
-		globalScope:      globalScope,
-		currentNamespace: glispNS,
-		keywordNamespace: keywordNS,
-		namespaces: map[string]namespace.Namespace{
-			glispNS.Name():     glispNS,
-			keywordNS.Name():   keywordNS,
-			glispUserNS.Name(): glispUserNS,
-		},
-		scopes:  scopes,
-		context: map[string]interface{}{},
+		globalScope: globalScope,
+		namespaces:  map[string]namespace.Namespace{},
+		scopes:      scopes,
+		context:     map[string]interface{}{},
 	}
 
-	glispNS.Add(globals.NILSymbol, true)
-	glispNS.Add(globals.TSymbol, true)
-	glispNS.Add(globals.AndRestSymbol, true)
-	glispNS.Add(globals.BackquoteSymbol, true)
-	glispNS.Add(globals.CloseParenthesisSymbol, true)
-	glispNS.Add(globals.DotSymbol, true)
-	glispNS.Add(globals.QuoteSymbol, true)
-	glispNS.Add(globals.SpliceSymbol, true)
-	glispNS.Add(globals.UnquoteSymbol, true)
+	glispNS := namespacesSetup.CreateGlispNamespace(env)
+	keywordNS := namespaces.NewNamespace("KEYWORD", false)
+	glispUserNS := namespaces.NewNamespace("GLISP-USER", true)
+	mathNS := namespacesSetup.CreateMathNamespace(env)
 
-	env.AddGlobalBinding(globals.QuoteSymbol, builtin.CreateBuiltinQuote())
-	env.AddGlobalBinding(globals.BackquoteSymbol, builtin.CreateBuiltinBackquote())
-	env.AddGlobalBinding(globals.UnquoteSymbol, builtin.CreateBuiltinUnquote())
-	env.AddGlobalBinding(globals.SpliceSymbol, builtin.CreateBuiltinUnquote())
+	env.namespaces[glispNS.Name()] = glispNS
+	env.namespaces[keywordNS.Name()] = keywordNS
+	env.namespaces[glispUserNS.Name()] = glispUserNS
+	env.namespaces[mathNS.Name()] = mathNS
 
-	env.AddGlobalBinding(glispNS.DefineSymbol("LIST", true, nil, true), builtin.CreateBuiltinList())
-	env.AddGlobalBinding(glispNS.DefineSymbol("CDR", true, nil, true), builtin.CreateBuiltinCdr())
-	env.AddGlobalBinding(glispNS.DefineSymbol("CAR", true, nil, true), builtin.CreateBuiltinCar())
-	env.AddGlobalBinding(glispNS.DefineSymbol("CONS", true, nil, true), builtin.CreateBuiltinCons())
-	env.AddGlobalBinding(glispNS.DefineSymbol("LAMBDA", true, nil, true), builtin.CreateBuiltinLambda())
-	env.AddGlobalBinding(glispNS.DefineSymbol("MACRO", true, nil, true), builtin.CreateBuiltinMacro())
-	env.AddGlobalBinding(glispNS.DefineSymbol("GENSYM", true, nil, true), builtin.CreateBuiltinGensym())
-	env.AddGlobalBinding(glispNS.DefineSymbol("PRINT", true, nil, true), builtin.CreateBuiltinPrint())
-	env.AddGlobalBinding(glispNS.DefineSymbol("EXIT", true, nil, true), builtin.CreateBuiltinExit())
-	env.AddGlobalBinding(glispNS.DefineSymbol("RETURN", true, nil, true), builtin.CreateBuiltinReturn())
-	env.AddGlobalBinding(glispNS.DefineSymbol("LOAD", true, nil, true), builtin.CreateBuiltinLoad())
-	env.AddGlobalBinding(glispNS.DefineSymbol("VAR", true, nil, true), builtin.CreateBuiltinVar())
-	env.AddGlobalBinding(glispNS.DefineSymbol("=", true, nil, true), builtin.CreateBuiltinAssign())
-	env.AddGlobalBinding(glispNS.DefineSymbol("SCOPE", true, nil, true), builtin.CreateBuiltinScope())
-	env.AddGlobalBinding(glispNS.DefineSymbol("EVAL", true, nil, true), builtin.CreateBuiltinEval())
-	env.AddGlobalBinding(glispNS.DefineSymbol("ELT", true, nil, true), builtin.CreateBuiltinElt())
-	env.AddGlobalBinding(glispNS.DefineSymbol("ARRAY", true, nil, true), builtin.CreateBuiltinArray())
-	env.AddGlobalBinding(glispNS.DefineSymbol("MAKE-ARRAY", true, nil, true), builtin.CreateBuiltinMakeArray())
-	env.AddGlobalBinding(glispNS.DefineSymbol("IF", true, nil, true), builtin.CreateBuiltinIf())
-	env.AddGlobalBinding(glispNS.DefineSymbol("PROGN", true, nil, true), builtin.CreateBuiltinProgn())
-	env.AddGlobalBinding(glispNS.DefineSymbol("TRY", true, nil, true), builtin.CreateBuiltinTry())
-	env.AddGlobalBinding(glispNS.DefineSymbol("THROW", true, nil, true), builtin.CreateBuiltinThrow())
-	env.AddGlobalBinding(glispNS.DefineSymbol("DICTIONARY", true, nil, true), builtin.CreateBuiltinDictionary())
-	env.AddGlobalBinding(glispNS.DefineSymbol("AND", true, nil, true), builtin.CreateBuiltinAnd())
-	env.AddGlobalBinding(glispNS.DefineSymbol("OR", true, nil, true), builtin.CreateBuiltinOr())
-	env.AddGlobalBinding(glispNS.DefineSymbol("NOT", true, nil, true), builtin.CreateBuiltinNot())
-	env.AddGlobalBinding(glispNS.DefineSymbol("NAMESPACE", true, nil, true), builtin.CreateBuiltinNamespace())
-	env.AddGlobalBinding(glispNS.DefineSymbol("IN-NAMESPACE", true, nil, true), builtin.CreateBuiltinInNamespace())
-	env.AddGlobalBinding(glispNS.DefineSymbol("USE-NAMESPACE", true, nil, true), builtin.CreateBuiltinUseNamespace())
-
-	env.AddGlobalBinding(glispNS.DefineSymbol("INT8", true, nil, true), numbers.CreateBuiltinInt8())
-	env.AddGlobalBinding(glispNS.DefineSymbol("INT16", true, nil, true), numbers.CreateBuiltinInt16())
-	env.AddGlobalBinding(glispNS.DefineSymbol("INT32", true, nil, true), numbers.CreateBuiltinInt32())
-	env.AddGlobalBinding(glispNS.DefineSymbol("INT64", true, nil, true), numbers.CreateBuiltinInt64())
-	env.AddGlobalBinding(glispNS.DefineSymbol("UINT8", true, nil, true), numbers.CreateBuiltinUint8())
-	env.AddGlobalBinding(glispNS.DefineSymbol("UINT16", true, nil, true), numbers.CreateBuiltinUint16())
-	env.AddGlobalBinding(glispNS.DefineSymbol("UINT32", true, nil, true), numbers.CreateBuiltinUint32())
-	env.AddGlobalBinding(glispNS.DefineSymbol("UINT64", true, nil, true), numbers.CreateBuiltinUint64())
-	env.AddGlobalBinding(glispNS.DefineSymbol("FLOAT32", true, nil, true), numbers.CreateBuiltinFloat32())
-	env.AddGlobalBinding(glispNS.DefineSymbol("FLOAT64", true, nil, true), numbers.CreateBuiltinFloat64())
-
-	env.AddGlobalBinding(glispNS.DefineSymbol("+", true, nil, true), numbers.CreateBuiltinNumberAdd())
-	env.AddGlobalBinding(glispNS.DefineSymbol("-", true, nil, true), numbers.CreateBuiltinNumberSubtract())
-	env.AddGlobalBinding(glispNS.DefineSymbol("*", true, nil, true), numbers.CreateBuiltinNumberMultiply())
-	env.AddGlobalBinding(glispNS.DefineSymbol("/", true, nil, true), numbers.CreateBuiltinNumberDivide())
-	env.AddGlobalBinding(glispNS.DefineSymbol("%", true, nil, true), numbers.CreateBuiltinNumberModulo())
+	// Set keyword namespace
+	env.keywordNamespace = keywordNS
 
 	// Let glisp-user namespace use the glisp namespace
 	glispUserNS.Use(glispNS)

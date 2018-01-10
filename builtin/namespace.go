@@ -25,7 +25,7 @@ func namespaceGetName(obj types.Object) (string, error) {
 		return goStrings.ToUpper(string(obj.(strings.String))), nil
 	}
 
-	return "", errors.New("namespace expected a string or symbol")
+	return "", errors.New("NAMESPACE expected a string or symbol")
 }
 
 func namespaceClauseContainsOnlyNames(c *cons.Cons) bool {
@@ -50,7 +50,7 @@ func importSymbolsFromOtherNamespace(ns namespace.Namespace, clause *cons.Cons, 
 	otherNS := env.FindNamespace(nsName)
 
 	if otherNS == nil {
-		return fmt.Errorf("import-from undefined namespace %v", nsName)
+		return fmt.Errorf("IMPORT-FROM undefined namespace %v", nsName)
 	}
 
 	if clause.Cdr.Type() != types.Cons {
@@ -62,7 +62,7 @@ func importSymbolsFromOtherNamespace(ns namespace.Namespace, clause *cons.Cons, 
 		success := ns.Import(name, otherNS)
 
 		if !success {
-			return false, fmt.Errorf("import-from namespace %v unknown symbol %v", nsName, name)
+			return false, fmt.Errorf("IMPORT-FROM namespace %v unknown symbol %v", nsName, name)
 		}
 
 		return false, nil

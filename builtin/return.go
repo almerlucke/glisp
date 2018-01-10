@@ -13,7 +13,7 @@ import (
 // Return builtin function
 func Return(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	if !env.HasDepthContext("CallDepth") {
-		return nil, errors.New("return can only be used inside a macro or lambda body")
+		return nil, errors.New("RETURN can only be used inside a macro or lambda body")
 	}
 
 	returnContext := function.ReturnContext{Object: args.Car}

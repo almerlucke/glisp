@@ -17,7 +17,7 @@ func Lambda(args *cons.Cons, env environment.Environment, context interface{}) (
 
 	// Arg list must be cons or nil
 	if argType != types.Cons && argType != types.Null {
-		return nil, errors.New("lambda expected an arg list as first argument")
+		return nil, errors.New("LAMBDA expected an arg list as first argument")
 	}
 
 	symList := []*symbols.Symbol{}
@@ -26,7 +26,7 @@ func Lambda(args *cons.Cons, env environment.Environment, context interface{}) (
 		argList := args.Car.(*cons.Cons)
 		pure, length := argList.Info()
 		if !pure {
-			return nil, errors.New("lambda arg list must be a pure list")
+			return nil, errors.New("LAMBDA arg list must be a pure list")
 		}
 
 		symList = make([]*symbols.Symbol, length)
@@ -34,11 +34,11 @@ func Lambda(args *cons.Cons, env environment.Environment, context interface{}) (
 		// Build sym arg slice
 		err := argList.Iter(func(obj types.Object, index interface{}) (bool, error) {
 			if obj.Type() != types.Symbol {
-				return false, errors.New("lambda arg list must contain only symbols")
+				return false, errors.New("LAMBDA arg list must contain only symbols")
 			}
 
 			if obj.(*symbols.Symbol).Reserved {
-				return false, fmt.Errorf("lambda arg list contains reserved symbol %v", obj.(*symbols.Symbol))
+				return false, fmt.Errorf("LAMBDA arg list contains reserved symbol %v", obj.(*symbols.Symbol))
 			}
 
 			symList[index.(uint64)] = obj.(*symbols.Symbol)

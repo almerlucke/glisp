@@ -21,7 +21,7 @@ func Car(args *cons.Cons, env environment.Environment, context interface{}) (typ
 		return obj.(*cons.Cons).Car, nil
 	}
 
-	return nil, errors.New("car expects a list as argument")
+	return nil, errors.New("CAR expects a list as argument")
 }
 
 // CreateBuiltinCar creates a builtin function object

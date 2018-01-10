@@ -19,7 +19,7 @@ import (
 // Load builtin function
 func Load(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	if args.Car.Type() != types.String {
-		return nil, errors.New("load expected a path string as first argument")
+		return nil, errors.New("LOAD expected a path string as first argument")
 	}
 
 	path := args.Car.(strings.String)

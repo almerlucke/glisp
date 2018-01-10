@@ -16,12 +16,12 @@ func Dictionary(args *cons.Cons, env environment.Environment, context interface{
 
 	err := args.Iter(func(obj types.Object, index interface{}) (bool, error) {
 		if obj.Type() != types.Cons {
-			return false, errors.New("illegal key value pair for dictionary")
+			return false, errors.New("illegal key value pair for DICTIONARY")
 		}
 
 		pair := obj.(*cons.Cons)
 		if pair.Length() != 2 {
-			return false, errors.New("illegal key value pair for dictionary")
+			return false, errors.New("illegal key value pair for DICTIONARY")
 		}
 
 		key := pair.Car

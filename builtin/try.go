@@ -58,11 +58,11 @@ func Try(args *cons.Cons, env environment.Environment, context interface{}) (res
 // Throw an exception
 func Throw(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
 	if !env.HasDepthContext("TryDepth") {
-		return nil, errors.New("throw can only be used inside a try block")
+		return nil, errors.New("THROW can only be used inside a try block")
 	}
 
 	if args.Car.Type() != types.String {
-		return nil, errors.New("throw expected a string as first argument")
+		return nil, errors.New("THROW expected a string as first argument")
 	}
 
 	tctx := &tryContext{

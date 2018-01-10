@@ -122,6 +122,86 @@ func New(kind reflect.Kind) *Number {
 	return num
 }
 
+// NewInt8 new int8
+func NewInt8(val int8) *Number {
+	return &Number{
+		Kind:  reflect.Int8,
+		Value: Int8(val),
+	}
+}
+
+// NewInt16 new int16
+func NewInt16(val int16) *Number {
+	return &Number{
+		Kind:  reflect.Int16,
+		Value: Int16(val),
+	}
+}
+
+// NewInt32 new int32
+func NewInt32(val int32) *Number {
+	return &Number{
+		Kind:  reflect.Int32,
+		Value: Int32(val),
+	}
+}
+
+// NewInt64 new int64
+func NewInt64(val int64) *Number {
+	return &Number{
+		Kind:  reflect.Int64,
+		Value: Int64(val),
+	}
+}
+
+// NewUint8 new uint8
+func NewUint8(val uint8) *Number {
+	return &Number{
+		Kind:  reflect.Uint8,
+		Value: Uint8(val),
+	}
+}
+
+// NewUint16 new uint16
+func NewUint16(val uint16) *Number {
+	return &Number{
+		Kind:  reflect.Uint16,
+		Value: Uint16(val),
+	}
+}
+
+// NewUint32 new uint32
+func NewUint32(val uint32) *Number {
+	return &Number{
+		Kind:  reflect.Uint32,
+		Value: Uint32(val),
+	}
+}
+
+// NewUint64 new uint64
+func NewUint64(val uint64) *Number {
+	return &Number{
+		Kind:  reflect.Uint64,
+		Value: Uint64(val),
+	}
+}
+
+// NewFloat32 new float32
+func NewFloat32(val float32) *Number {
+	return &Number{
+		Kind:  reflect.Float32,
+		Value: Float32(val),
+	}
+}
+
+// NewFloat64 new float64
+func NewFloat64(val float64) *Number {
+	return &Number{
+		Kind:  reflect.Float64,
+		Value: Float64(val),
+	}
+}
+
 // SetInt64Value set value with int64
 func (num *Number) SetInt64Value(val int64) {
 	switch num.Kind {

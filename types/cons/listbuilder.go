@@ -1,6 +1,8 @@
 package cons
 
-import "github.com/almerlucke/glisp/types"
+import (
+	"github.com/almerlucke/glisp/types"
+)
 
 // ListBuilder can be used to build lists of cons objects
 type ListBuilder struct {
@@ -44,4 +46,15 @@ func (builder *ListBuilder) Append(c *Cons) {
 	}
 
 	builder.Tail = c.Last()
+}
+
+// ListFromSlice creates a list from a slice of objects
+func ListFromSlice(sl []types.Object) *Cons {
+	builder := ListBuilder{}
+
+	for _, obj := range sl {
+		builder.PushBackObject(obj)
+	}
+
+	return builder.Head
 }

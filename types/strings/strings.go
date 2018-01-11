@@ -1,7 +1,9 @@
 package strings
 
 import (
+	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/almerlucke/glisp/types"
 )
@@ -20,12 +22,12 @@ func (str String) String() string {
 }
 
 // Compare for comparable interface
-func (str String) Compare(obj types.Comparable) bool {
+func (str String) Compare(obj types.Comparable) (int, error) {
 	otherStr, ok := obj.(String)
 
 	if !ok {
-		return false
+		return 0, errors.New("unequal types for comparison")
 	}
 
-	return str == otherStr
+	return strings.Compare(string(str), string(otherStr)), nil
 }

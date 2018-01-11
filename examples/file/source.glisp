@@ -4,6 +4,12 @@
   )
 )
 
+(var --
+  (macro (arg)
+    `(= ,arg (- ,arg 1))
+  )
+)
+
 (scope
   (var a 0)
   (while (< a 10)

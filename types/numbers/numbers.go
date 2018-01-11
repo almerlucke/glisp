@@ -1,6 +1,7 @@
 package numbers
 
 import (
+	"errors"
 	"fmt"
 	"math"
 	"reflect"
@@ -80,14 +81,29 @@ func (num *Number) String() string {
 }
 
 // Compare for comparable interface
-func (num *Number) Compare(obj types.Comparable) bool {
+func (num *Number) Compare(obj types.Comparable) (int, error) {
 	otherNum, ok := obj.(*Number)
 
 	if !ok {
-		return false
+		return 0, errors.New("unequal types for comparison")
 	}
 
-	return num.Value == otherNum.Value
+	g, err := num.GreaterThan(otherNum)
+	if err != nil {
+		return 0, err
+	}
+
+	if g {
+		return 1, nil
+	}
+
+	g, _ = num.LesserThan(otherNum)
+
+	if g {
+		return -1, nil
+	}
+
+	return 0, nil
 }
 
 // New number

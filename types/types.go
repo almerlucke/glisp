@@ -36,7 +36,7 @@ type Object interface {
 
 // Comparable object that can be compared
 type Comparable interface {
-	Compare(Comparable) bool
+	Compare(Comparable) (int, error)
 }
 
 // Nil is an empty struct, there will only be one Nil struct created, the

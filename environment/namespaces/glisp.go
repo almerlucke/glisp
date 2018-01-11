@@ -2,6 +2,7 @@ package namespaces
 
 import (
 	"github.com/almerlucke/glisp/builtin"
+	"github.com/almerlucke/glisp/builtin/loops"
 	"github.com/almerlucke/glisp/builtin/numbers"
 	"github.com/almerlucke/glisp/globals/symbols"
 
@@ -17,6 +18,7 @@ func CreateGlispNamespace(env environment.Environment) namespace.Namespace {
 	glispNS.Add(symbols.NILSymbol, true)
 	glispNS.Add(symbols.TSymbol, true)
 	glispNS.Add(symbols.AndRestSymbol, true)
+	glispNS.Add(symbols.SelfSymbol, true)
 	glispNS.Add(symbols.BackquoteSymbol, true)
 	glispNS.Add(symbols.CloseParenthesisSymbol, true)
 	glispNS.Add(symbols.DotSymbol, true)
@@ -48,7 +50,7 @@ func CreateGlispNamespace(env environment.Environment) namespace.Namespace {
 	env.AddGlobalBinding(glispNS.DefineSymbol("ARRAY", true, nil, true), builtin.CreateBuiltinArray())
 	env.AddGlobalBinding(glispNS.DefineSymbol("MAKE-ARRAY", true, nil, true), builtin.CreateBuiltinMakeArray())
 	env.AddGlobalBinding(glispNS.DefineSymbol("IF", true, nil, true), builtin.CreateBuiltinIf())
-	env.AddGlobalBinding(glispNS.DefineSymbol("PROGN", true, nil, true), builtin.CreateBuiltinProgn())
+	env.AddGlobalBinding(glispNS.DefineSymbol("DO", true, nil, true), builtin.CreateBuiltinDo())
 	env.AddGlobalBinding(glispNS.DefineSymbol("TRY", true, nil, true), builtin.CreateBuiltinTry())
 	env.AddGlobalBinding(glispNS.DefineSymbol("THROW", true, nil, true), builtin.CreateBuiltinThrow())
 	env.AddGlobalBinding(glispNS.DefineSymbol("DICTIONARY", true, nil, true), builtin.CreateBuiltinDictionary())
@@ -58,6 +60,10 @@ func CreateGlispNamespace(env environment.Environment) namespace.Namespace {
 	env.AddGlobalBinding(glispNS.DefineSymbol("NAMESPACE", true, nil, true), builtin.CreateBuiltinNamespace())
 	env.AddGlobalBinding(glispNS.DefineSymbol("IN-NAMESPACE", true, nil, true), builtin.CreateBuiltinInNamespace())
 	env.AddGlobalBinding(glispNS.DefineSymbol("USE-NAMESPACE", true, nil, true), builtin.CreateBuiltinUseNamespace())
+	env.AddGlobalBinding(glispNS.DefineSymbol("MAP", true, nil, true), builtin.CreateBuiltinMap())
+
+	env.AddGlobalBinding(glispNS.DefineSymbol("WHILE", true, nil, true), loops.CreateBuiltinWhile())
+	env.AddGlobalBinding(glispNS.DefineSymbol("BREAK", true, nil, true), loops.CreateBuiltinBreak())
 
 	env.AddGlobalBinding(glispNS.DefineSymbol("INT8", true, nil, true), numbers.CreateBuiltinInt8())
 	env.AddGlobalBinding(glispNS.DefineSymbol("INT16", true, nil, true), numbers.CreateBuiltinInt16())
@@ -75,6 +81,10 @@ func CreateGlispNamespace(env environment.Environment) namespace.Namespace {
 	env.AddGlobalBinding(glispNS.DefineSymbol("*", true, nil, true), numbers.CreateBuiltinNumberMultiply())
 	env.AddGlobalBinding(glispNS.DefineSymbol("/", true, nil, true), numbers.CreateBuiltinNumberDivide())
 	env.AddGlobalBinding(glispNS.DefineSymbol("%", true, nil, true), numbers.CreateBuiltinNumberModulo())
+	env.AddGlobalBinding(glispNS.DefineSymbol(">", true, nil, true), numbers.CreateBuiltinNumberGreaterThan())
+	env.AddGlobalBinding(glispNS.DefineSymbol(">=", true, nil, true), numbers.CreateBuiltinNumberGreaterThanOrEqual())
+	env.AddGlobalBinding(glispNS.DefineSymbol("<", true, nil, true), numbers.CreateBuiltinNumberLesserThan())
+	env.AddGlobalBinding(glispNS.DefineSymbol("<=", true, nil, true), numbers.CreateBuiltinNumberLesserThanOrEqual())
 	env.AddGlobalBinding(glispNS.DefineSymbol("MAX", true, nil, true), numbers.CreateBuiltinNumberMax())
 	env.AddGlobalBinding(glispNS.DefineSymbol("MIN", true, nil, true), numbers.CreateBuiltinNumberMin())
 

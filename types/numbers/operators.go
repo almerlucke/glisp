@@ -7,6 +7,142 @@ import (
 	"reflect"
 )
 
+// LesserThanOrEqual lesser or equal
+func (num *Number) LesserThanOrEqual(otherNum *Number) (bool, error) {
+	if num.Kind != otherNum.Kind {
+		return false, fmt.Errorf("can't compare %v with %v number", otherNum.Kind, num.Kind)
+	}
+
+	greaterThan := false
+
+	switch num.Value.(type) {
+	case Int8:
+		greaterThan = num.Value.(Int8) <= otherNum.Value.(Int8)
+	case Int16:
+		greaterThan = num.Value.(Int16) <= otherNum.Value.(Int16)
+	case Int32:
+		greaterThan = num.Value.(Int32) <= otherNum.Value.(Int32)
+	case Int64:
+		greaterThan = num.Value.(Int64) <= otherNum.Value.(Int64)
+	case Uint8:
+		greaterThan = num.Value.(Uint8) <= otherNum.Value.(Uint8)
+	case Uint16:
+		greaterThan = num.Value.(Uint16) <= otherNum.Value.(Uint16)
+	case Uint32:
+		greaterThan = num.Value.(Uint32) <= otherNum.Value.(Uint32)
+	case Uint64:
+		greaterThan = num.Value.(Uint64) <= otherNum.Value.(Uint64)
+	case Float32:
+		greaterThan = num.Value.(Float32) <= otherNum.Value.(Float32)
+	case Float64:
+		greaterThan = num.Value.(Float64) <= otherNum.Value.(Float64)
+	}
+
+	return greaterThan, nil
+}
+
+// LesserThan lesser than
+func (num *Number) LesserThan(otherNum *Number) (bool, error) {
+	if num.Kind != otherNum.Kind {
+		return false, fmt.Errorf("can't compare %v with %v number", otherNum.Kind, num.Kind)
+	}
+
+	greaterThan := false
+
+	switch num.Value.(type) {
+	case Int8:
+		greaterThan = num.Value.(Int8) < otherNum.Value.(Int8)
+	case Int16:
+		greaterThan = num.Value.(Int16) < otherNum.Value.(Int16)
+	case Int32:
+		greaterThan = num.Value.(Int32) < otherNum.Value.(Int32)
+	case Int64:
+		greaterThan = num.Value.(Int64) < otherNum.Value.(Int64)
+	case Uint8:
+		greaterThan = num.Value.(Uint8) < otherNum.Value.(Uint8)
+	case Uint16:
+		greaterThan = num.Value.(Uint16) < otherNum.Value.(Uint16)
+	case Uint32:
+		greaterThan = num.Value.(Uint32) < otherNum.Value.(Uint32)
+	case Uint64:
+		greaterThan = num.Value.(Uint64) < otherNum.Value.(Uint64)
+	case Float32:
+		greaterThan = num.Value.(Float32) < otherNum.Value.(Float32)
+	case Float64:
+		greaterThan = num.Value.(Float64) < otherNum.Value.(Float64)
+	}
+
+	return greaterThan, nil
+}
+
+// GreaterThan greater than
+func (num *Number) GreaterThan(otherNum *Number) (bool, error) {
+	if num.Kind != otherNum.Kind {
+		return false, fmt.Errorf("can't compare %v with %v number", otherNum.Kind, num.Kind)
+	}
+
+	greaterThan := false
+
+	switch num.Value.(type) {
+	case Int8:
+		greaterThan = num.Value.(Int8) > otherNum.Value.(Int8)
+	case Int16:
+		greaterThan = num.Value.(Int16) > otherNum.Value.(Int16)
+	case Int32:
+		greaterThan = num.Value.(Int32) > otherNum.Value.(Int32)
+	case Int64:
+		greaterThan = num.Value.(Int64) > otherNum.Value.(Int64)
+	case Uint8:
+		greaterThan = num.Value.(Uint8) > otherNum.Value.(Uint8)
+	case Uint16:
+		greaterThan = num.Value.(Uint16) > otherNum.Value.(Uint16)
+	case Uint32:
+		greaterThan = num.Value.(Uint32) > otherNum.Value.(Uint32)
+	case Uint64:
+		greaterThan = num.Value.(Uint64) > otherNum.Value.(Uint64)
+	case Float32:
+		greaterThan = num.Value.(Float32) > otherNum.Value.(Float32)
+	case Float64:
+		greaterThan = num.Value.(Float64) > otherNum.Value.(Float64)
+	}
+
+	return greaterThan, nil
+}
+
+// GreaterThanOrEqual greater than or equal
+func (num *Number) GreaterThanOrEqual(otherNum *Number) (bool, error) {
+	if num.Kind != otherNum.Kind {
+		return false, fmt.Errorf("can't compare %v with %v number", otherNum.Kind, num.Kind)
+	}
+
+	greaterThan := false
+
+	switch num.Value.(type) {
+	case Int8:
+		greaterThan = num.Value.(Int8) >= otherNum.Value.(Int8)
+	case Int16:
+		greaterThan = num.Value.(Int16) >= otherNum.Value.(Int16)
+	case Int32:
+		greaterThan = num.Value.(Int32) >= otherNum.Value.(Int32)
+	case Int64:
+		greaterThan = num.Value.(Int64) >= otherNum.Value.(Int64)
+	case Uint8:
+		greaterThan = num.Value.(Uint8) >= otherNum.Value.(Uint8)
+	case Uint16:
+		greaterThan = num.Value.(Uint16) >= otherNum.Value.(Uint16)
+	case Uint32:
+		greaterThan = num.Value.(Uint32) >= otherNum.Value.(Uint32)
+	case Uint64:
+		greaterThan = num.Value.(Uint64) >= otherNum.Value.(Uint64)
+	case Float32:
+		greaterThan = num.Value.(Float32) >= otherNum.Value.(Float32)
+	case Float64:
+		greaterThan = num.Value.(Float64) >= otherNum.Value.(Float64)
+	}
+
+	return greaterThan, nil
+}
+
 // Add two numbers
 func (num *Number) Add(otherNum *Number) (*Number, error) {
 	if num.Kind != otherNum.Kind {

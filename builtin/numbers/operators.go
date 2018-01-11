@@ -226,6 +226,186 @@ func NumberMin(args *cons.Cons, env environment.Environment, context interface{}
 	return min, nil
 }
 
+// NumberGreaterThan check if each argument is strictly greater than the following argument
+func NumberGreaterThan(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
+	var prev *numbers.Number
+	var err error
+
+	greaterThan := true
+
+	err = args.Iter(func(obj types.Object, index interface{}) (bool, error) {
+		num, ok := obj.(*numbers.Number)
+		if !ok {
+			return false, errors.New("> only accepts numbers")
+		}
+
+		if prev != nil {
+			greaterThan, err = prev.GreaterThan(num)
+			if err != nil {
+				return false, err
+			}
+
+			if !greaterThan {
+				return true, nil
+			}
+		}
+
+		prev = num
+
+		return false, nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	if greaterThan {
+		return types.T, nil
+	}
+
+	return types.NIL, nil
+}
+
+// NumberGreaterThanOrEqual check if each argument is strictly greater or equal than the following argument
+func NumberGreaterThanOrEqual(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
+	var prev *numbers.Number
+	var err error
+
+	greaterThanOrEqual := true
+
+	err = args.Iter(func(obj types.Object, index interface{}) (bool, error) {
+		num, ok := obj.(*numbers.Number)
+		if !ok {
+			return false, errors.New(">= only accepts numbers")
+		}
+
+		if prev != nil {
+			greaterThanOrEqual, err = prev.GreaterThanOrEqual(num)
+			if err != nil {
+				return false, err
+			}
+
+			if !greaterThanOrEqual {
+				return true, nil
+			}
+		}
+
+		prev = num
+
+		return false, nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	if greaterThanOrEqual {
+		return types.T, nil
+	}
+
+	return types.NIL, nil
+}
+
+// NumberLesserThan check if each argument is strictly lesser than the following argument
+func NumberLesserThan(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
+	var prev *numbers.Number
+	var err error
+
+	lesserThan := true
+
+	err = args.Iter(func(obj types.Object, index interface{}) (bool, error) {
+		num, ok := obj.(*numbers.Number)
+		if !ok {
+			return false, errors.New("< only accepts numbers")
+		}
+
+		if prev != nil {
+			lesserThan, err = prev.LesserThan(num)
+			if err != nil {
+				return false, err
+			}
+
+			if !lesserThan {
+				return true, nil
+			}
+		}
+
+		prev = num
+
+		return false, nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	if lesserThan {
+		return types.T, nil
+	}
+
+	return types.NIL, nil
+}
+
+// NumberLesserThanOrEqual check if each argument is strictly lesser than or equal to the following argument
+func NumberLesserThanOrEqual(args *cons.Cons, env environment.Environment, context interface{}) (types.Object, error) {
+	var prev *numbers.Number
+	var err error
+
+	lesserThanOrEqual := true
+
+	err = args.Iter(func(obj types.Object, index interface{}) (bool, error) {
+		num, ok := obj.(*numbers.Number)
+		if !ok {
+			return false, errors.New("<= only accepts numbers")
+		}
+
+		if prev != nil {
+			lesserThanOrEqual, err = prev.LesserThanOrEqual(num)
+			if err != nil {
+				return false, err
+			}
+
+			if !lesserThanOrEqual {
+				return true, nil
+			}
+		}
+
+		prev = num
+
+		return false, nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	if lesserThanOrEqual {
+		return types.T, nil
+	}
+
+	return types.NIL, nil
+}
+
+// CreateBuiltinNumberGreaterThan creates a function object
+func CreateBuiltinNumberGreaterThan() *functions.BuiltinFunction {
+	return functions.NewBuiltinFunction(NumberGreaterThan, 1, true)
+}
+
+// CreateBuiltinNumberGreaterThanOrEqual creates a function object
+func CreateBuiltinNumberGreaterThanOrEqual() *functions.BuiltinFunction {
+	return functions.NewBuiltinFunction(NumberGreaterThanOrEqual, 1, true)
+}
+
+// CreateBuiltinNumberLesserThan creates a function object
+func CreateBuiltinNumberLesserThan() *functions.BuiltinFunction {
+	return functions.NewBuiltinFunction(NumberLesserThan, 1, true)
+}
+
+// CreateBuiltinNumberLesserThanOrEqual creates a function object
+func CreateBuiltinNumberLesserThanOrEqual() *functions.BuiltinFunction {
+	return functions.NewBuiltinFunction(NumberLesserThanOrEqual, 1, true)
+}
+
 // CreateBuiltinNumberAdd creates a function object
 func CreateBuiltinNumberAdd() *functions.BuiltinFunction {
 	return functions.NewBuiltinFunction(NumberAdd, 1, true)

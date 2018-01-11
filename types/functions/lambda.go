@@ -103,6 +103,9 @@ func (fun *LambdaFunction) Eval(args *cons.Cons, env environment.Environment, co
 		env.AddBinding(globals.AndRestSymbol, types.NIL)
 	}
 
+	// Add binding for &self symbol with the lambda function itself
+	env.AddBinding(globals.SelfSymbol, fun)
+
 	if fun.body != nil {
 		err = fun.body.Iter(func(obj types.Object, index interface{}) (bool, error) {
 			result, err = env.Eval(obj, context)

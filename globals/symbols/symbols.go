@@ -70,3 +70,11 @@ var AndRestSymbol = &symbols.Symbol{
 	Reserved: true,
 	Interned: true,
 }
+
+// SelfSymbol is used to bind the lambda function inside its own body,
+// to allow for recursion with anonymous functions
+var SelfSymbol = &symbols.Symbol{
+	Name:     "&SELF",
+	Reserved: true,
+	Interned: true,
+}

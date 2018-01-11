@@ -1,11 +1,16 @@
-(namespace :test (:use :glisp) (:export :test))
+(var ++
+  (macro (arg)
+    `(= ,arg (+ ,arg 1))
+  )
+)
 
-(in-namespace :test)
-
-(var test "dit is een test")
-
-(in-namespace :glisp-user)
-
-(use-namespace :test)
-
-(print test)
+(scope
+  (var a 0)
+  (while (< a 10)
+    (do
+      (print a)
+      (++ a)
+      NIL
+    )
+  )
+)

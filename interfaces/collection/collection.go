@@ -13,9 +13,12 @@ type IterFun func(obj types.Object, index interface{}) (bool, error)
 
 // Collection interface
 type Collection interface {
+	types.Object
 	Access(index interface{}) (types.Object, error)
 	Assign(index interface{}, val types.Object) error
 	Map(fun MapFun) (Collection, error)
 	Iter(fun IterFun) error
 	Length() uint64
+
+	// Reduce types.Object
 }

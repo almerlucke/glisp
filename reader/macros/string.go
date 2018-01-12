@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"math"
 	"strconv"
-	"unicode"
 
 	"github.com/almerlucke/glisp/interfaces/reader"
 	"github.com/almerlucke/glisp/reader/utils"
@@ -14,31 +13,9 @@ import (
 	"github.com/almerlucke/glisp/types/strings"
 )
 
-func runeToHexValue(r rune) uint32 {
-	var v uint32
-
-	if r > 96 {
-		v = uint32(r - 87)
-	} else if r > 64 {
-		v = uint32(r - 55)
-	} else {
-		v = uint32(r - 48)
-	}
-
-	return v
-}
-
-func isOctal(r rune) bool {
-	return r >= 48 && r < 56
-}
-
-func isHexadecimal(r rune) bool {
-	return unicode.Is(unicode.ASCII_Hex_Digit, r)
-}
-
 func octalEscape(startDigit rune, rd reader.Reader) (rune, error) {
 	rs, err := rd.NextRunes(2, func(r rune) (bool, error) {
-		return !isOctal(r), nil
+		return !utils.IsOctal(r), nil
 	})
 
 	o := uint(startDigit - 48)
@@ -51,12 +28,12 @@ func octalEscape(startDigit rune, rd reader.Reader) (rune, error) {
 
 func hexadecimalEscape(rd reader.Reader) (rune, error) {
 	rs, err := rd.NextRunes(math.MaxInt32, func(r rune) (bool, error) {
-		return !isHexadecimal(r), nil
+		return !utils.IsHexadecimal(r), nil
 	})
 
 	hex := uint32(0)
 	for _, r := range rs {
-		hex = (hex << 4) + runeToHexValue(r)
+		hex = (hex << 4) + utils.RuneToHexValue(r)
 	}
 
 	return rune(hex), err
@@ -64,7 +41,7 @@ func hexadecimalEscape(rd reader.Reader) (rune, error) {
 
 func unicodeEscape(n int, escapeChar rune, rd reader.Reader) ([]rune, error) {
 	rs, err := rd.NextRunes(n, func(r rune) (bool, error) {
-		return !isHexadecimal(r), nil
+		return !utils.IsHexadecimal(r), nil
 	})
 
 	if err != nil {
@@ -115,7 +92,7 @@ func escapeSequence(rd reader.Reader) ([]rune, error) {
 	case 'U':
 		s, err = unicodeEscape(8, 'U', rd)
 	default:
-		if isOctal(c) {
+		if utils.IsOctal(c) {
 			c, err = octalEscape(c, rd)
 		}
 	}

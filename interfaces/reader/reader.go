@@ -73,6 +73,7 @@ type Reader interface {
 	IsWhitespace(c rune) bool
 	IsNewline(c rune) bool
 	DispatchMacroForCharacter(c *Character) DispatchMacroFunction
+	ParseToken(bool) (string, error)
 	ReadObject() (types.Object, error)
 	Context() map[string]interface{}
 }

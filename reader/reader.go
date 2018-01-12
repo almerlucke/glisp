@@ -228,7 +228,8 @@ func (rd *Reader) tokenToObject(token string) (types.Object, error) {
 	return sym, nil
 }
 
-func (rd *Reader) parseToken() (types.Object, error) {
+// ParseToken parse token
+func (rd *Reader) ParseToken(extended bool) (string, error) {
 	cl := list.New()
 	singleEscapeActive := false
 	multipleEscapeActive := false
@@ -238,17 +239,17 @@ func (rd *Reader) parseToken() (types.Object, error) {
 		if err != nil {
 			if err == io.EOF {
 				if singleEscapeActive || multipleEscapeActive {
-					return nil, errors.New("end of stream reached before end of escape")
+					return "", errors.New("end of stream reached before end of escape")
 				}
 
 				break
 			}
 
-			return nil, rd.ErrorWithError(err)
+			return "", rd.ErrorWithError(err)
 		}
 
 		if ci == nil {
-			return nil, fmt.Errorf("illegal character %c found", c)
+			return "", fmt.Errorf("illegal character %c found", c)
 		}
 
 		if singleEscapeActive {
@@ -262,7 +263,11 @@ func (rd *Reader) parseToken() (types.Object, error) {
 			}
 		} else {
 			if ci.SyntaxType == reader.Constituent {
-				cl.PushBack(unicode.ToUpper(c))
+				if extended {
+					cl.PushBack(c)
+				} else {
+					cl.PushBack(unicode.ToUpper(c))
+				}
 			} else if ci.SyntaxType == reader.SingleEscape {
 				singleEscapeActive = true
 			} else if ci.SyntaxType == reader.MultipleEscape {
@@ -272,7 +277,7 @@ func (rd *Reader) parseToken() (types.Object, error) {
 			} else if ci.SyntaxType == reader.TerminatingMacro || ci.SyntaxType == reader.Whitespace {
 				err = rd.UnreadChar()
 				if err != nil {
-					return nil, err
+					return "", err
 				}
 				break
 			}
@@ -281,7 +286,7 @@ func (rd *Reader) parseToken() (types.Object, error) {
 		c, ci, err = rd.ReadChar()
 	}
 
-	return rd.tokenToObject(string(utils.RuneListToSlice(cl)))
+	return string(utils.RuneListToSlice(cl)), nil
 }
 
 // DispatchMacroForCharacter returns a dispatch macro for a character
@@ -322,8 +327,14 @@ func (rd *Reader) ReadObject() (types.Object, error) {
 			return nil, err
 		}
 
-		obj, err = rd.parseToken()
+		var token string
+		token, err = rd.ParseToken(false)
 		if err != nil && err != io.EOF {
+			return nil, err
+		}
+
+		obj, err = rd.tokenToObject(token)
+		if err != nil {
 			return nil, err
 		}
 

@@ -31,6 +31,8 @@ func TypeOf(args *cons.Cons, env environment.Environment, context interface{}) (
 		typeSym = env.InternKeyword("NUMBER")
 	case types.String:
 		typeSym = env.InternKeyword("STRING")
+	case types.Character:
+		typeSym = env.InternKeyword("CHARACTER")
 	case types.Symbol:
 		typeSym = env.InternKeyword("SYMBOL")
 	}

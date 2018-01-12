@@ -18,6 +18,8 @@ const (
 	Cons
 	// String object type
 	String
+	// Character object type
+	Character
 	// Number object type
 	Number
 	// Function object type

@@ -14,7 +14,8 @@ var DefaultDispatchTable = generateDefaultDispatchTable()
 
 func generateDefaultDispatchTable() reader.DispatchTable {
 	table := map[rune]reader.DispatchMacroFunction{
-		'|': dispatch.CommentDispatch,
+		'|':  dispatch.CommentDispatch,
+		'\\': dispatch.CharacterDispatch,
 	}
 
 	return table

@@ -117,3 +117,13 @@ func (a Array) String() string {
 
 	return buffer.String()
 }
+
+// Eql obj
+func (a Array) Eql(obj types.Object) bool {
+	return false
+}
+
+// Equal obj
+func (a Array) Equal(obj types.Object) bool {
+	return false
+}

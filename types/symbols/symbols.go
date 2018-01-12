@@ -29,3 +29,13 @@ func (sym *Symbol) String() string {
 
 	return "#:" + sym.Name
 }
+
+// Eql obj
+func (sym *Symbol) Eql(obj types.Object) bool {
+	return sym == obj
+}
+
+// Equal obj
+func (sym *Symbol) Equal(obj types.Object) bool {
+	return sym == obj
+}

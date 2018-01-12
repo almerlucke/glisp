@@ -48,6 +48,16 @@ func (c *Cons) String() string {
 	return buffer.String()
 }
 
+// Eql check
+func (c *Cons) Eql(obj types.Object) bool {
+	return c == obj
+}
+
+// Equal check
+func (c *Cons) Equal(obj types.Object) bool {
+	return (obj.Type() == types.Cons) && c.Car.Equal(obj.(*Cons).Car) && c.Cdr.Equal(obj.(*Cons).Cdr)
+}
+
 // Last returns last linked cons
 func (c *Cons) Last() *Cons {
 	// Get last cons from c

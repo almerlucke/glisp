@@ -51,3 +51,13 @@ func (fun *BuiltinFunction) Eval(args *cons.Cons, env environment.Environment, c
 func (fun *BuiltinFunction) String() string {
 	return fmt.Sprintf("function(%p)", fun)
 }
+
+// Eql obj
+func (fun *BuiltinFunction) Eql(obj types.Object) bool {
+	return fun == obj
+}
+
+// Equal obj
+func (fun *BuiltinFunction) Equal(obj types.Object) bool {
+	return fun == obj
+}

@@ -49,6 +49,16 @@ func (fun *LambdaFunction) String() string {
 	return fmt.Sprintf("lambda(%p)", fun)
 }
 
+// Eql obj
+func (fun *LambdaFunction) Eql(obj types.Object) bool {
+	return fun == obj
+}
+
+// Equal obj
+func (fun *LambdaFunction) Equal(obj types.Object) bool {
+	return fun == obj
+}
+
 // Eval lambda function evaluation
 func (fun *LambdaFunction) Eval(args *cons.Cons, env environment.Environment, context interface{}) (result types.Object, err error) {
 	// First push captured scope

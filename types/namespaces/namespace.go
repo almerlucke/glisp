@@ -64,6 +64,16 @@ func (n *Namespace) String() string {
 	return fmt.Sprintf("#<The %v namespace>", n.name)
 }
 
+// Eql obj
+func (n *Namespace) Eql(obj types.Object) bool {
+	return n == obj
+}
+
+// Equal obj
+func (n *Namespace) Equal(obj types.Object) bool {
+	return n == obj
+}
+
 // Name of the namespace
 func (n *Namespace) Name() string {
 	return n.name

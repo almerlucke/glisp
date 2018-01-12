@@ -40,6 +40,16 @@ func (d Dictionary) String() string {
 	return str + ")"
 }
 
+// Eql obj
+func (d Dictionary) Eql(obj types.Object) bool {
+	return false
+}
+
+// Equal obj
+func (d Dictionary) Equal(obj types.Object) bool {
+	return false
+}
+
 // Length of dictionary
 func (d Dictionary) Length() uint64 {
 	return uint64(len(d))

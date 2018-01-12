@@ -21,6 +21,20 @@ func (str String) String() string {
 	return fmt.Sprintf("\"%v\"", string(str))
 }
 
+// Eql obj
+func (str String) Eql(obj types.Object) bool {
+	if obj.Type() == types.String {
+		return str == obj.(String)
+	}
+
+	return false
+}
+
+// Equal obj
+func (str String) Equal(obj types.Object) bool {
+	return str.Eql(obj)
+}
+
 // Compare for comparable interface
 func (str String) Compare(obj types.Comparable) (int, error) {
 	otherStr, ok := obj.(String)

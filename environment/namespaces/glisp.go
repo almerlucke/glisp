@@ -61,6 +61,9 @@ func CreateGlispNamespace(env environment.Environment) namespace.Namespace {
 	env.AddGlobalBinding(glispNS.DefineSymbol("IN-NAMESPACE", true, nil, true), builtin.CreateBuiltinInNamespace())
 	env.AddGlobalBinding(glispNS.DefineSymbol("USE-NAMESPACE", true, nil, true), builtin.CreateBuiltinUseNamespace())
 	env.AddGlobalBinding(glispNS.DefineSymbol("MAP", true, nil, true), builtin.CreateBuiltinMap())
+	env.AddGlobalBinding(glispNS.DefineSymbol("TYPE-OF", true, nil, true), builtin.CreateBuiltinTypeOf())
+	env.AddGlobalBinding(glispNS.DefineSymbol("EQL", true, nil, true), builtin.CreateBuiltinEql())
+	env.AddGlobalBinding(glispNS.DefineSymbol("EQUAL", true, nil, true), builtin.CreateBuiltinEqual())
 
 	env.AddGlobalBinding(glispNS.DefineSymbol("WHILE", true, nil, true), loops.CreateBuiltinWhile())
 	env.AddGlobalBinding(glispNS.DefineSymbol("BREAK", true, nil, true), loops.CreateBuiltinBreak())

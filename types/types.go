@@ -1,6 +1,8 @@
 package types
 
-import "fmt"
+import (
+	"fmt"
+)
 
 // Type of lisp object
 type Type uint
@@ -32,6 +34,8 @@ const (
 type Object interface {
 	fmt.Stringer
 	Type() Type
+	Eql(Object) bool
+	Equal(Object) bool
 }
 
 // Comparable object that can be compared
@@ -64,6 +68,16 @@ func (b *Bool) String() string {
 	return "T"
 }
 
+// Eql obj
+func (b *Bool) Eql(obj Object) bool {
+	return obj == b
+}
+
+// Equal obj
+func (b *Bool) Equal(obj Object) bool {
+	return obj == b
+}
+
 // Type Null
 func (n *Nil) Type() Type {
 	return Null
@@ -72,4 +86,14 @@ func (n *Nil) Type() Type {
 // String implements the stringer interface
 func (n *Nil) String() string {
 	return "NIL"
+}
+
+// Eql obj
+func (n *Nil) Eql(obj Object) bool {
+	return obj == n
+}
+
+// Equal obj
+func (n *Nil) Equal(obj Object) bool {
+	return obj == n
 }

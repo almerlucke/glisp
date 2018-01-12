@@ -51,6 +51,16 @@ func (fun *MacroFunction) String() string {
 	return fmt.Sprintf("macro(%p)", fun)
 }
 
+// Eql obj
+func (fun *MacroFunction) Eql(obj types.Object) bool {
+	return fun == obj
+}
+
+// Equal obj
+func (fun *MacroFunction) Equal(obj types.Object) bool {
+	return fun == obj
+}
+
 // Macro expansion
 func (fun *MacroFunction) expansion(args *cons.Cons, env environment.Environment, context interface{}) (result types.Object, err error) {
 	// First push captured scope

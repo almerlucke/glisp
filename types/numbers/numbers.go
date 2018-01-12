@@ -80,6 +80,20 @@ func (num *Number) String() string {
 	return fmt.Sprintf("%v", num.Value)
 }
 
+// Eql obj
+func (num *Number) Eql(obj types.Object) bool {
+	if obj.Type() == types.Number {
+		return num.Value == obj.(*Number).Value
+	}
+
+	return false
+}
+
+// Equal obj
+func (num *Number) Equal(obj types.Object) bool {
+	return num.Eql(obj)
+}
+
 // Compare for comparable interface
 func (num *Number) Compare(obj types.Comparable) (int, error) {
 	otherNum, ok := obj.(*Number)
